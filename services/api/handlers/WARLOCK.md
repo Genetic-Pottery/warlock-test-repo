@@ -3,20 +3,27 @@
 
 # handlers
 
-Package handlers defines HTTP routing for the API service, providing a Router type that registers and matches request paths under a versioned prefix.
+The handlers package defines HTTP routing for the API service, providing the Router type that registers and matches request paths under a versioned prefix.
 
 ## Files
 
-- `routes.go` (298 B) — Defines Router struct with prefix field, DefaultPrefix constant ("/v1"), NewRouter() constructor, and Handle(path string) bool method checking non-empty paths. · declares `Router`, `NewRouter`, `r`
-- `routes_test.go` (312 B) — Tests Router.Handle, including TestRouterHandlesNonEmptyPaths verifying non-empty paths are handled.
+- `routes.go` (298 B) — Defines Router struct with prefix field, DefaultPrefix constant ("/v1"), NewRouter() constructor, and Handle(path) method returning whether path is non-empty. · declares `Router`, `NewRouter`, `r`
+- `routes_test.go` (312 B) — Test file with TestRouterHandlesNonEmptyPaths verifying Router.Handle behavior on non-empty paths.
 
 ## Structure
 
-- routes_test.go calls NewRouter and Router.Handle defined in routes.go
-- NewRouter initializes Router with DefaultPrefix
+- NewRouter() constructs a Router with prefix set to DefaultPrefix
+- Router.Handle(path) is called on instances returned by NewRouter()
+- routes_test.go depends on routes.go's Router and Handle
+
+## Rules
+
+- DefaultPrefix is fixed to "/v1"
+- Handle(path) returns true only when path length is greater than 0
 
 ## Where to look
 
-- what path prefix does the API use → `routes.go` `DefaultPrefix`
-- how are routes matched or handled → `routes.go` `Handle`
-- test coverage for routing → `routes_test.go` `TestRouterHandlesNonEmptyPaths`
+- how are HTTP routes registered → `routes.go` `Router`
+- what is the default API version prefix → `routes.go` `DefaultPrefix`
+- how to create a new router → `routes.go` `NewRouter`
+- tests for path handling → `routes_test.go` `TestRouterHandlesNonEmptyPaths`

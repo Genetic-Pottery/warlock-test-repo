@@ -3,15 +3,15 @@
 
 # web
 
-Web app root directory containing the src subdirectory, which holds the cart API helper, legacy retry utility, and cart component logic for the shopping cart UI.
+The web app directory, containing shared API utilities, legacy helper code, and the src subdirectory holding the app's source including the Cart component subsystem.
 
 ## Directories
 
-- `src/` — Top-level source: fetchCart API helper, legacy retry utility, and components subdirectory with Cart class and cart limit logic.
+- `src/` — Holds shared API utilities (BASE_URL, fetchCart), legacy retry() helper, and the Cart component subsystem; go here for cart line-item logic or API/retry helpers.
 
 ## Where to look
 
-- fetching a cart by id → `src` `fetchCart`
-- retrying a function call a fixed number of times → `src` `retry`
-- cart add/duplicate item logic → `src` `Cart`
-- maximum items allowed in a cart → `src` `CART_LIMIT`
+- base URL used for API requests → `src` `BASE_URL`
+- how to fetch a cart by id → `src` `fetchCart`
+- retry logic and retry limit for function calls → `src` `retry`
+- cart line items, add() behavior, or CART_LIMIT → `src` `Cart`

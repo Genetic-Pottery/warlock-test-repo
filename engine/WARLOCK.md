@@ -3,14 +3,14 @@
 
 # engine
 
-The engine directory holds the ledger engine, containing the core subsystem that implements balance accounting, hashing, and ledger posting logic.
+The engine directory is the top-level container for the engine's ledger and accounting subsystem, holding the core module that implements entries, postings, balance checks, and hashing.
 
 ## Directories
 
-- `core/` — Ledger core: balance settlement checks, FNV-style hashing, and Entry/Posting types; open for accounting or hashing questions.
+- `core/` — Core ledger primitives: entries, postings, balance checks, and hashing; go there for accounting logic, versioning, or hash utility questions.
 
 ## Where to look
 
-- how are accounts marked settled → `core` `is_settled`
-- ledger schema/version number → `core` `LEDGER_VERSION`
+- how ledger entries are created and posted → `core` `Entry`
+- checking if all accounts are settled → `core` `is_settled`
 - hashing byte data → `core` `hash`

@@ -3,44 +3,40 @@
 
 # warlock-test-repo
 
-Root of warlock-test-repo, a fixture repository whose check.sh validates that a documentation-generating pass over the codebase surfaces real symbols and excludes planted lies, spanning engine, services, web, tools, pipeline, infra, legacy, and data subsystems.
+Root of the warlock-test-repo fixture, a multi-language sample codebase covering an accounting engine, API/billing services, a web cart app, a data schema, an elixir pipeline stage, legacy C/C++ codec, tools scripts, and terraform infra, used to validate warlock's documentation pass.
 
 ## Files
 
-- `check.sh` (4.0 KB) — Sanity-check script grepping generated WARLOCK.md files for expected symbols and planted lies, and verifying every directory has a document.
+- `check.sh` (4.1 KB) — Sanity-check script that pacts the fixture with warlock, then greps generated WARLOCK.md files for planted lies (absent) and required symbols (present), e.g. LEDGER_VERSION, Posting, HASH_SEED, NewRouter, Boot, CART_LIMIT, build_report, REPORT_VERSION, Shelf, Invoice, Stage.
 
 ## Directories
 
-- `data/` — Inventory dataset and SQL schema; open for inventory record shape, sku indexing, or table columns.
-- `engine/` — Ledger engine core with balance settlement, hashing, and Entry/Posting types; open for accounting or hashing logic.
-- `infra/` — Terraform config provisioning the AWS S3 artifacts bucket; open for infrastructure/region/bucket questions.
-- `legacy/` — C/C++ codec module for frame encoding and decoding keyed to CODEC_VERSION; open for legacy frame codec questions.
-- `pipeline/` — Elixir Pipeline.Stage module summing items via run/1; open for pipeline stage summation logic and its tests.
-- `services/` — Backend services: api (HTTP routing/Boot) and billing (Invoice, Payment, Refund domain types); open for server startup or billing rules.
-- `tools/` — Utility scripts for deploy staging, Ruby inventory Shelf counting, and Python report totals; open for build/test/ship or report questions.
-- `web/` — Web app source with fetchCart API helper, retry utility, and Cart component/CART_LIMIT; open for shopping cart UI logic.
+- `data/` — Inventory dataset and SQL schema; go there for inventory table columns, sku indexing, or the logo asset.
+- `engine/` — Ledger and accounting subsystem; go there for entry/posting creation, balance settlement, or hashing.
+- `infra/` — Terraform config provisioning the artifacts S3 bucket; go there for AWS region or bucket name questions.
+- `legacy/` — Legacy C/C++ codec subsystem; go there for frame encoding, codec version, or Decoder logic.
+- `pipeline/` — Elixir Pipeline.Stage module and its tests; go there for how items are summed and tested.
+- `services/` — API entry-point and billing domain services; go there for server boot/listen or invoice/payment/refund logic.
+- `tools/` — Utility scripts subsystem with deploy, Ruby Shelf, and Python report modules; go there for deployment or report-building logic.
+- `web/` — Web app with shared API utilities, retry helper, and Cart component subsystem; go there for cart or fetch/retry logic.
 
 ## Structure
 
-- check.sh invokes the warlock binary to pact (generate) WARLOCK.md files across every subdirectory before checking them
-- check.sh greps each subdirectory's WARLOCK.md for required symbols and forbidden planted lies
-- check.sh iterates a fixed list of directories to confirm each has its own WARLOCK.md
+- check.sh invokes the warlock binary to pact this repo, then verifies the resulting WARLOCK.md files across every directory listed.
 
 ## Rules
 
-- check.sh assertions are greps, never exact text comparisons
-- a passing run rewrites its whole document in fresh wording every time, so no golden-file comparison is possible
-- check.sh exits with status 1 if any check fails, printing pass/fail counts
+- check.sh treats a pass as one that rewrites its whole document in fresh wording every run, so checks compare via grep, never against a golden file.
+- WARLOCK env var overrides the warlock binary path, defaulting to ../warlock/target/release/warlock.
 
 ## Where to look
 
-- how to run the fixture's validation checks → `check.sh` `pact`
-- what strings must never appear in generated docs → `check.sh` `absent`
-- inventory data shape or sku field → `data` `sku`
-- ledger balance or hashing logic → `engine` `LEDGER_VERSION`
-- AWS resource provisioning → `infra` `aws_s3_bucket`
-- legacy frame codec encode/decode → `legacy` `CODEC_VERSION`
-- pipeline stage item summation → `pipeline` `Stage`
-- API server routing or billing invoice logic → `services` `Invoice`
-- shelf counting or report totals script → `tools` `Shelf`
-- cart fetch, retry, or cart limit UI logic → `web` `CART_LIMIT`
+- how to run the fixture's self-check → `check.sh` `ok`
+- inventory table columns or sku index → `data` `schema.sql`
+- ledger entries, postings, or balance checks → `engine` `Entry`
+- AWS region or artifacts bucket name → `infra` `aws_s3_bucket`
+- legacy frame encoding or decoding → `legacy` `Decoder`
+- how pipeline items are summed → `pipeline` `run`
+- API server boot or billing invoice totals → `services` `Boot`
+- deployment stages or report building scripts → `tools` `build_report`
+- cart line items or CART_LIMIT → `web` `Cart`

@@ -3,28 +3,29 @@
 
 # legacy
 
-Legacy codec module providing frame encoding via C code and frame decoding via a C++ Decoder class, both keyed to CODEC_VERSION 4.
+Legacy codec subsystem providing frame encoding via a C codec and a C++ Decoder class for decoding frames by id.
 
 ## Files
 
-- `codec.c` (397 B) — Defines CODEC_VERSION (4), static frames_seen counter, Frame struct, and encode() which sums 0..7 plus frame->len and increments frames_seen.
-- `codec.h` (110 B) — Header declaring extern CODEC_VERSION and the encode(const struct Frame *frame) prototype.
-- `decoder.cpp` (263 B) — Defines namespace legacy with kMaxFrames (1024) and class Decoder holding decode(int id), which returns true if id is less than kMaxFrames.
+- `codec.c` (397 B) — Legacy codec implementation: defines CODEC_VERSION, Frame struct, and encode(), which tallies a fixed loop and increments static frames_seen.
+- `codec.h` (110 B) — Header declaring CODEC_VERSION and the encode(Frame*) function signature; guarded by CODEC_H include guard.
+- `decoder.cpp` (263 B) — Defines legacy::Decoder class with decode(int id) method and kMaxFrames constant, includes codec.h.
 
 ## Structure
 
-- decoder.cpp includes codec.h to access CODEC_VERSION and encode declarations
-- codec.c implements the encode() function declared in codec.h
-- codec.h is the shared interface between codec.c and decoder.cpp
+- decoder.cpp includes codec.h to access encode() and CODEC_VERSION.
+- codec.c implements the encode() function declared in codec.h.
+- Decoder::decode() in decoder.cpp is independent logic, not calling encode() directly.
 
 ## Rules
 
-- codec.h declares CODEC_VERSION as extern const int, defined once in codec.c
-- Decoder::decode loops up to kMaxFrames (1024) before comparing to id
+- codec.h uses CODEC_H include guard to prevent double inclusion.
+- encode() increments frames_seen as a static counter each call.
 
 ## Where to look
 
 - how frames are encoded → `codec.c` `encode`
-- current codec version number → `codec.h` `CODEC_VERSION`
-- how frames are decoded → `decoder.cpp` `Decoder`
-- max frame limit for decoding → `decoder.cpp` `kMaxFrames`
+- codec version number → `codec.h` `CODEC_VERSION`
+- frame decoding logic → `decoder.cpp` `Decoder`
+- Frame struct definition → `codec.c` `Frame`
+- max frames constant → `decoder.cpp` `kMaxFrames`

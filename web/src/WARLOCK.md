@@ -3,31 +3,25 @@
 
 # src
 
-Top-level source directory of the web app, holding a fetchCart API helper, a legacy retry utility, and the components subdirectory implementing the shopping cart UI logic.
+Top-level source directory of the web app, holding shared API utilities, legacy helper code, and the Cart component subsystem.
 
 ## Files
 
-- `api.ts` (130 B) — Exports BASE_URL constant and async fetchCart(id) function that returns the given cart id. · declares `BASE_URL`, `fetchCart`
-- `legacy.js` (145 B) — Legacy CommonJS module exporting RETRY_LIMIT constant (3) and retry(fn) function that calls fn up to RETRY_LIMIT times. · declares `RETRY_LIMIT`, `retry`
+- `api.ts` (130 B) — Defines BASE_URL constant and async fetchCart(id) function returning the id. · declares `BASE_URL`, `fetchCart`
+- `legacy.js` (145 B) — Defines RETRY_LIMIT constant and retry(fn) function that calls fn RETRY_LIMIT times; exports both via module.exports. · declares `RETRY_LIMIT`, `retry`
 
 ## Directories
 
-- `components/` — Cart component logic: Cart class, CartLine/CartState types, CART_LIMIT; go here for cart add behavior or item limits.
+- `components/` — Holds the Cart component (Cart class, CartLine, CartState, cartState) and its tests; go here for cart line-item logic.
 
 ## Structure
 
-- api.ts and legacy.js are independent, standalone modules with no imports between them
-- legacy.js's retry() calls the passed-in fn up to RETRY_LIMIT times in a loop
-
-## Rules
-
-- legacy.js sets RETRY_LIMIT to 3
+- api.ts and legacy.js are independent, standalone modules with no cross-imports shown
+- legacy.js's retry() wraps calls to an arbitrary fn passed in by callers
 
 ## Where to look
 
-- fetching a cart by id → `api.ts` `fetchCart`
 - base URL used for API requests → `api.ts` `BASE_URL`
-- retrying a function call a fixed number of times → `legacy.js` `retry`
-- how many times an operation is retried → `legacy.js` `RETRY_LIMIT`
-- cart add/duplicate item logic → `components` `Cart`
-- maximum items allowed in a cart → `components` `CART_LIMIT`
+- how to fetch a cart by id → `api.ts` `fetchCart`
+- retry logic and retry limit for function calls → `legacy.js` `retry`
+- cart line items, add() behavior, or CART_LIMIT → `components` `Cart`
