@@ -3,20 +3,25 @@
 
 # components
 
-Holds the Cart component logic: a Cart class managing line items with add-by-sku uniqueness, plus its unit tests.
+Holds the Cart component logic for the shopping cart, providing the Cart class, its line-item types, and cart state derivation used by the app's cart UI.
 
 ## Files
 
-- `Cart.test.tsx` (370 B) — Tests for Cart, checking that adding a line not already present succeeds; other cases elided.
-- `Cart.tsx` (459 B) — Defines CART_LIMIT constant, CartLine interface, CartState type, Cart class with add(), and cartState() function. · declares `CART_LIMIT`, `CartLine`, `CartState`, `Cart`, `cartState`
+- `Cart.test.tsx` (370 B) — Tests for Cart, including that adding a line not already present succeeds.
+- `Cart.tsx` (459 B) — Defines CART_LIMIT constant, CartLine and CartState types, the Cart class with add(), and cartState() function. · declares `CART_LIMIT`, `CartLine`, `CartState`, `Cart`, `cartState`
 
 ## Structure
 
-- Cart.test.tsx imports and exercises Cart from Cart.tsx
-- cartState() takes a Cart and returns a CartState
+- Cart.test.tsx imports and exercises the Cart class defined in Cart.tsx
+- cartState() in Cart.tsx takes a Cart instance and returns a CartState
+
+## Rules
+
+- Cart.add() rejects a line whose sku is already present, returning false
 
 ## Where to look
 
-- how duplicate SKUs are handled when adding to cart → `Cart.tsx` `add`
-- maximum number of items allowed in cart → `Cart.tsx` `CART_LIMIT`
-- test coverage for adding cart lines → `Cart.test.tsx` `Cart`
+- how many items a cart can hold → `Cart.tsx` `CART_LIMIT`
+- shape of a cart line item → `Cart.tsx` `CartLine`
+- how cart empty/filled status is determined → `Cart.tsx` `cartState`
+- tests for adding items to the cart → `Cart.test.tsx` `Cart`

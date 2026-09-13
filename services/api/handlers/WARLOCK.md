@@ -3,27 +3,26 @@
 
 # handlers
 
-The handlers package defines HTTP routing for the API service, providing the Router type that registers and matches request paths under a versioned prefix.
+Defines HTTP route handling for the api service, providing the Router type used to register and match request paths under a versioned prefix.
 
 ## Files
 
-- `routes.go` (298 B) — Defines Router struct with prefix field, DefaultPrefix constant ("/v1"), NewRouter() constructor, and Handle(path) method returning whether path is non-empty. · declares `Router`, `NewRouter`, `r`
+- `routes.go` (298 B) — Defines Router struct with prefix field, DefaultPrefix constant ("/v1"), NewRouter() constructor, and Handle(path string) bool method checking non-empty paths. · declares `Router`, `NewRouter`, `r`
 - `routes_test.go` (312 B) — Test file with TestRouterHandlesNonEmptyPaths verifying Router.Handle behavior on non-empty paths.
 
 ## Structure
 
-- NewRouter() constructs a Router with prefix set to DefaultPrefix
-- Router.Handle(path) is called on instances returned by NewRouter()
-- routes_test.go depends on routes.go's Router and Handle
+- NewRouter constructs a Router initialized with DefaultPrefix.
+- Handle is a method on Router that reports whether a given path is non-empty.
+- routes_test.go tests the Handle method of Router.
 
 ## Rules
 
-- DefaultPrefix is fixed to "/v1"
-- Handle(path) returns true only when path length is greater than 0
+- DefaultPrefix is fixed to "/v1".
+- Handle returns true only when the path length is greater than 0.
 
 ## Where to look
 
-- how are HTTP routes registered → `routes.go` `Router`
-- what is the default API version prefix → `routes.go` `DefaultPrefix`
-- how to create a new router → `routes.go` `NewRouter`
-- tests for path handling → `routes_test.go` `TestRouterHandlesNonEmptyPaths`
+- what prefix does the API version its routes with → `routes.go` `DefaultPrefix`
+- how to check if a path is valid for routing → `routes.go` `Handle`
+- tests covering router path handling → `routes_test.go` `TestRouterHandlesNonEmptyPaths`

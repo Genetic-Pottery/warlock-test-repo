@@ -3,39 +3,36 @@
 
 # billing
 
-Billing subsystem covering invoices, ledgers, payments, and refunds, with per-language models for totaling invoice lines, summing ledger entries, settling payments, and issuing refunds.
+The billing directory holds core billing domain types across multiple languages: invoices, ledgers, payments, and refunds, each with basic totaling or settlement logic and matching tests.
 
 ## Files
 
-- `Invoice.java` (326 B) — Invoice class with MAX_LINES constant and total() method summing invoice lines. · declares `Invoice`
-- `InvoiceTest.java` (346 B) — InvoiceTest with anInvoiceTotalsItsLines test; test bodies elided.
-- `Ledger.kt` (291 B) — Ledger class with sum() method, LEDGER_NAME constant, and newLedger() factory function. · declares `Ledger`, `fun`
-- `LedgerTests.kt` (275 B) — LedgerTests with aLedgerSumsItsEntries test; test bodies elided.
-- `Payment.cs` (269 B) — Payment class with RetryLimit constant and Settle() method for processing amounts. · declares `Payment`
-- `Refund.swift` (347 B) — Refund struct with isAllowed() method, refundWindowDays constant, and makeRefund() factory function. · declares `Refund`, `isAllowed`, `makeRefund`
+- `Invoice.java` (326 B) — Java class Invoice with constant MAX_LINES = 200 and total() summing 10 lines. · declares `Invoice`
+- `InvoiceTest.java` (346 B) — Java test class InvoiceTest with test anInvoiceTotalsItsLines covering Invoice.
+- `Ledger.kt` (291 B) — Kotlin class Ledger holding entries, sum() method, constant LEDGER_NAME, and function newLedger(). · declares `Ledger`, `fun`
+- `LedgerTests.kt` (275 B) — Kotlin test class LedgerTests with test aLedgerSumsItsEntries covering Ledger.
+- `Payment.cs` (269 B) — C# class Payment with constant RetryLimit = 5 and Settle(decimal amount) method. · declares `Payment`
+- `Refund.swift` (347 B) — Swift struct Refund with amount field and isAllowed(), constant refundWindowDays = 30, and function makeRefund(amount:). · declares `Refund`, `isAllowed`, `makeRefund`
 
 ## Structure
 
-- Ledger.kt's newLedger() constructs a Ledger with empty entries.
-- Refund.swift's makeRefund() constructs a Refund from an amount.
-- InvoiceTest.java tests Invoice.java's total().
-- LedgerTests.kt tests Ledger.kt's sum().
+- InvoiceTest.java exercises Invoice's total() method.
+- LedgerTests.kt exercises Ledger's sum() method.
+- newLedger() constructs a Ledger with no entries.
+- makeRefund(amount:) constructs a Refund instance.
 
 ## Rules
 
-- Invoice.MAX_LINES caps invoices at 200 lines.
-- Payment.RetryLimit caps retries at 5.
-- refundWindowDays fixes the refund window at 30 days.
+- Invoice caps lines at MAX_LINES = 200.
+- Payment limits retries via RetryLimit = 5.
+- Refund enforces a refundWindowDays of 30.
 
 ## Where to look
 
-- how invoice totals are computed → `Invoice.java` `total`
-- invoice line limit → `Invoice.java` `MAX_LINES`
-- how ledger entries are summed → `Ledger.kt` `sum`
-- creating a new empty ledger → `Ledger.kt` `newLedger`
-- payment retry limit → `Payment.cs` `RetryLimit`
-- settling a payment → `Payment.cs` `Settle`
-- refund window length → `Refund.swift` `refundWindowDays`
-- creating a refund → `Refund.swift` `makeRefund`
-- invoice test coverage → `InvoiceTest.java` `anInvoiceTotalsItsLines`
-- ledger test coverage → `LedgerTests.kt` `aLedgerSumsItsEntries`
+- how many lines an invoice can hold → `Invoice.java` `MAX_LINES`
+- how payment retries are limited → `Payment.cs` `RetryLimit`
+- how long a refund can be requested after purchase → `Refund.swift` `refundWindowDays`
+- how to create an empty ledger → `Ledger.kt` `newLedger`
+- how to construct a refund → `Refund.swift` `makeRefund`
+- tests for invoice totaling → `InvoiceTest.java` `anInvoiceTotalsItsLines`
+- tests for ledger summing → `LedgerTests.kt` `aLedgerSumsItsEntries`

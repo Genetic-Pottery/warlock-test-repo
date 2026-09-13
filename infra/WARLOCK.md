@@ -3,23 +3,24 @@
 
 # infra
 
-Terraform infrastructure definition provisioning the S3 bucket used to store build artifacts for this project.
+Terraform infrastructure configuration provisioning the S3 bucket used to store the project's build artifacts.
 
 ## Files
 
-- `main.tf` (210 B) — Defines variable region (default eu-west-1), resource aws_s3_bucket.artifacts (bucket warlock-test-artifacts), and output bucket_name.
+- `main.tf` (210 B) — Terraform config declaring the region variable, the aws_s3_bucket resource artifacts (bucket warlock-test-artifacts), and output bucket_name.
 
 ## Structure
 
-- output bucket_name reads from aws_s3_bucket.artifacts.bucket, which is created in the same file
+- output bucket_name reads its value from aws_s3_bucket.artifacts.bucket
+- aws_s3_bucket.artifacts is configured independently of the region variable
 
 ## Rules
 
-- region defaults to eu-west-1
-- bucket name is fixed to warlock-test-artifacts
+- variable region defaults to eu-west-1
+- the artifacts bucket name is fixed as warlock-test-artifacts
 
 ## Where to look
 
-- what AWS region is used → `main.tf` `region`
-- name of the S3 bucket for artifacts → `main.tf` `aws_s3_bucket`
-- terraform output values → `main.tf` `bucket_name`
+- where is the S3 bucket for build artifacts defined → `main.tf` `aws_s3_bucket.artifacts`
+- what AWS region does infra deploy to → `main.tf` `region`
+- what output exposes the bucket name → `main.tf` `bucket_name`

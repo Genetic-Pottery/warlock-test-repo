@@ -3,14 +3,18 @@
 
 # tools
 
-Utility scripts directory of the tools subsystem, holding a deployment shell script and a nested scripts directory with example Ruby and Python inventory/report modules and their tests.
+The tools directory holds the scripts subdirectory of utility scripts used for build/deploy automation and small Inventory and Report modules with their tests.
 
 ## Directories
 
-- `scripts/` — Holds deploy.sh, a Ruby Inventory/Shelf module with spec, and a Python Report module with test; go there for deployment stages, shelf item counting, or report building.
+- `scripts/` — Deploy shell script plus Ruby Inventory and Python Report modules with tests; go here for build/deploy stages, shelf counting, or report totals.
+
+## Structure
+
+- The only content of this directory is the scripts subdirectory.
 
 ## Where to look
 
-- how deployment stages run → `scripts` `REGION`
-- counting items in a shelf → `scripts` `Shelf`
-- building a report from rows → `scripts` `build_report`
+- how deployment stages run → `scripts` `deploy.sh`
+- shelf item limit or counting logic → `scripts` `SHELF_LIMIT`
+- building a report asynchronously → `scripts` `build_report_async`

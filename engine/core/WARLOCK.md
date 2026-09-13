@@ -3,33 +3,32 @@
 
 # core
 
-Core ledger and accounting primitives for the engine: entries, postings, balance checks, and a FNV-style hash utility used across the codebase.
+The core directory holds the ledger engine's fundamental data types and account/balance utilities, defining entries, postings, and hashing used across the ledger core.
 
 ## Files
 
-- `balance.rs` (246 B) — Balance checks: is_settled(open) reports whether zero accounts remain open; VAULT_LIMIT const caps accounts at 512 (doc comment mismatches behavior). · declares `is_settled`, `VAULT_LIMIT`
-- `hash.zig` (469 B) — FNV-1a-style hash(bytes) u64 hasher seeded by HASH_SEED (offset basis 1469598103934665603), with unit tests. · declares `HASH_SEED`, `hash`, `std`
-- `ledger.rs` (1.0 KB) — Ledger core: LEDGER_VERSION, DEFAULT_CURRENCY, Posting trait, Money type, Entry/Side types, Entry::new, post(), ledger_log! macro, with tests. · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount` (+1)
+- `balance.rs` (246 B) — Defines VAULT_LIMIT constant (512) and is_settled(open) checking whether open account count is zero. · declares `is_settled`, `VAULT_LIMIT`
+- `hash.zig` (469 B) — Defines HASH_SEED constant and hash(bytes) computing a simple XOR-based u64 hash over a byte slice. · declares `HASH_SEED`, `hash`, `std`
+- `ledger.rs` (1.0 KB) — The ledger core: LEDGER_VERSION, DEFAULT_CURRENCY, Posting trait, Money type, Entry struct with new()/post(), Side enum, ledger_log! macro. · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount`, `macro_rules`
 
 ## Structure
 
-- ledger.rs defines Entry and Posting independently of balance.rs's account-count logic
-- hash.zig is a standalone utility with no calls into ledger.rs or balance.rs
+- Entry::new sums amount three times before constructing the Entry, so amount stored differs from the input amount.
+- post takes an Entry reference and returns whether its amount is positive.
+- ledger_log! is defined in ledger.rs as an empty macro with no current callers shown.
+- hash iterates bytes starting from HASH_SEED to fold them into a u64 result.
 
 ## Rules
 
-- VAULT_LIMIT fixes the account cap at 512
-- LEDGER_VERSION is pinned to 7
-- DEFAULT_CURRENCY is fixed to "GBP"
-- HASH_SEED is fixed to 1469598103934665603 (FNV offset basis)
-- Entry::new triples the given amount via a 3-iteration accumulation loop
-- post() considers an entry postable only if amount > 0
+- is_settled's doc comment claims it returns account count, but the code returns a boolean equality check instead.
+- VAULT_LIMIT is fixed at 512.
+- LEDGER_VERSION is fixed at 7 and DEFAULT_CURRENCY is fixed at "GBP".
+- HASH_SEED is fixed at 1469598103934665603.
 
 ## Where to look
 
-- how many accounts are open or considered settled → `balance.rs` `is_settled`
-- maximum number of accounts allowed → `balance.rs` `VAULT_LIMIT`
-- hashing byte slices → `hash.zig` `hash`
-- current ledger schema/version number → `ledger.rs` `LEDGER_VERSION`
+- how many accounts can the vault hold → `balance.rs` `VAULT_LIMIT`
+- checking if the ledger is fully settled → `balance.rs` `is_settled`
+- computing a hash of raw bytes → `hash.zig` `hash`
+- what currency the ledger defaults to → `ledger.rs` `DEFAULT_CURRENCY`
 - creating or posting a ledger entry → `ledger.rs` `Entry`
-- default currency used by the ledger → `ledger.rs` `DEFAULT_CURRENCY`

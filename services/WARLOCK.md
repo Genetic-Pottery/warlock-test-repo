@@ -3,18 +3,14 @@
 
 # services
 
-The services directory groups the backend service subsystems, holding the API service (routing and boot) and the billing subsystem (invoices, ledgers, payments, refunds).
+The services directory groups independent service subsystems: the api entry point that boots the HTTP server and its handlers, and the billing domain covering invoices, ledgers, payments, and refunds.
 
 ## Directories
 
-- `api/` — API service root with Server type and Boot() entrypoint; go here for service startup or listen address questions.
-- `billing/` — Billing subsystem with per-language models for invoices, ledgers, payments, and refunds; go here for totaling, settlement, or refund questions.
+- `api/` — Api service entry point with the Server type and Boot(); go there for how the service starts, its listen address, or routing questions.
+- `billing/` — Core billing domain types (Invoice, Ledger, Payment, Refund) with totaling, retry, and refund-window logic and tests; go there for billing rules or calculations.
 
 ## Where to look
 
-- how does the API service start up → `api` `Boot`
-- how are invoice totals computed → `billing` `Invoice`
-- how are HTTP routes registered → `api` `Router`
-- how is a payment settled → `billing` `Payment`
-- how is a refund issued → `billing` `Refund`
-- how are ledger entries summed → `billing` `Ledger`
+- how the api service is started or what address it listens on → `api` `Boot`
+- how billing invoices, ledgers, payments, or refunds are limited or computed → `billing` `Invoice`

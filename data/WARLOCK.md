@@ -3,28 +3,27 @@
 
 # data
 
-Data directory holding the inventory dataset and its table schema, plus a binary logo asset, for a system tracking inventory records by id, sku, and qty.
+Data directory holding the inventory dataset and its database schema, backing an inventory tracking system keyed by id and sku.
 
 ## Files
 
-- `inventory.json` (1.6 MB) — Array of inventory records, each with id, sku (e.g. SKU-0000000), and qty; roughly 150,000 entries.
+- `inventory.json` (1.6 MB) — JSON array of inventory records, each with id, sku (SKU-xxxxxxx), and qty, ~150k entries.
 - `logo.bin` (16.0 KB) — not text; name and size only
 - `schema.sql` (159 B) — SQL DDL defining the inventory table (id, sku, qty) and the inventory_sku_idx index on sku.
 
 ## Structure
 
-- inventory.json rows correspond to the columns defined in schema.sql's inventory table.
-- schema.sql's inventory_sku_idx indexes the sku field found in inventory.json records.
+- inventory.json's records correspond to rows of the inventory table defined in schema.sql.
+- inventory_sku_idx indexes the sku column that inventory.json entries populate.
 
 ## Rules
 
-- id is BIGINT PRIMARY KEY in schema.sql.
-- sku is TEXT NOT NULL in schema.sql.
-- qty is INTEGER NOT NULL DEFAULT 0 in schema.sql.
+- id is declared PRIMARY KEY in the inventory table.
+- sku is NOT NULL in the inventory table.
+- qty is INTEGER NOT NULL DEFAULT 0 in the inventory table.
 
 ## Where to look
 
-- what columns does the inventory table have → `schema.sql` `inventory`
-- sample or full inventory records → `inventory.json` `sku`
-- is there an index on sku → `schema.sql` `inventory_sku_idx`
-- logo image asset → `logo.bin`
+- what fields does an inventory record have → `schema.sql` `inventory`
+- sample or bulk inventory data → `inventory.json` `sku`
+- how sku lookups are indexed → `schema.sql` `inventory_sku_idx`

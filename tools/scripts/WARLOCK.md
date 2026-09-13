@@ -3,33 +3,33 @@
 
 # scripts
 
-Utility scripts directory holding a deployment shell script, a Ruby inventory module with its spec, and a Python reporting module with its test, unrelated small standalone examples.
+Utility scripts directory holding a deploy shell script and small Ruby and Python modules (Inventory, Report) with their accompanying tests, used for build/deploy and inventory or reporting logic.
 
 ## Files
 
-- `deploy.sh` (99 B) — Shell script running deploy stages build, test, ship in sequence for REGION eu-west-1.
-- `inventory.rb` (256 B) — Ruby module Inventory with SHELF_LIMIT and Shelf class holding items, counting totals; Inventory.build creates a Shelf. · declares `Inventory`, `Shelf`, `initialize`, `count`, `self.build`
-- `inventory_spec.rb` (252 B) — Spec for Inventory::Shelf, testing that it counts the items on it.
-- `report.py` (360 B) — Python module defining REPORT_VERSION, DEFAULT_ROWS, Report class with total(), and build_report/build_report_async factory functions. · declares `build_report_async`, `Report`, `__init__`, `total`, `build_report`
-- `test_report.py` (224 B) — Test file verifying Report totals its rows via test_report_totals_its_rows.
+- `deploy.sh` (99 B) — Shell script that sets REGION to eu-west-1 and loops through build, test, ship stages, echoing the running stage.
+- `inventory.rb` (256 B) — Ruby module Inventory with SHELF_LIMIT constant, Shelf class holding items and a count method, and self.build factory method. · declares `Inventory`, `Shelf`, `initialize`, `count`, `self.build`
+- `inventory_spec.rb` (252 B) — Spec file testing Inventory::Shelf, including a test that counts the items on it.
+- `report.py` (360 B) — Python module defining REPORT_VERSION and DEFAULT_ROWS constants, Report class with a total method, and build_report and build_report_async functions. · declares `build_report_async`, `Report`, `__init__`, `total`, `build_report`
+- `test_report.py` (224 B) — Test file with test_report_totals_its_rows verifying Report totals behavior.
 
 ## Structure
 
-- inventory_spec.rb tests Inventory::Shelf defined in inventory.rb
-- test_report.py tests Report and build_report from report.py
-- deploy.sh runs independently of the Ruby and Python files
+- inventory_spec.rb tests the Shelf class and count method defined in inventory.rb.
+- test_report.py tests the Report class and build_report function defined in report.py.
+- deploy.sh runs its stages independently of the Ruby and Python files in this directory.
 
 ## Rules
 
-- deploy.sh sets -eu to fail fast on errors and unset variables
-- Inventory::Shelf enforces SHELF_LIMIT as a constant on the module
-- report.py pins REPORT_VERSION to 3 and DEFAULT_ROWS to 100
+- deploy.sh sets REGION to eu-west-1 for its run.
+- deploy.sh uses set -eu to fail on errors and unset variables.
+- Inventory module defines SHELF_LIMIT as 40.
+- report.py pins REPORT_VERSION to 3 and DEFAULT_ROWS to 100.
 
 ## Where to look
 
 - how deployment stages run → `deploy.sh` `REGION`
-- counting items in a shelf → `inventory.rb` `Shelf`
-- shelf item count test → `inventory_spec.rb` `Inventory::Shelf`
-- building a report from rows → `report.py` `build_report`
-- async report building → `report.py` `build_report_async`
-- report totals test → `test_report.py` `test_report_totals_its_rows`
+- shelf item limit or counting logic → `inventory.rb` `SHELF_LIMIT`
+- tests for shelf counting behavior → `inventory_spec.rb` `Shelf`
+- building a report asynchronously → `report.py` `build_report_async`
+- tests verifying report totals → `test_report.py` `test_report_totals_its_rows`
