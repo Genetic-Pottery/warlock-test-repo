@@ -3,26 +3,16 @@
 
 # api
 
-The api directory is the entry point for the api service, defining the Server type that boots the service and listens on a fixed address.
+Defines the Server struct and its Boot() constructor for starting the HTTP server, listening on 0.0.0.0:8080 by default.
 
 ## Files
 
-- `server.go` (140 B) — Defines Server struct with addr field, ListenAddr constant ("0.0.0.0:8080"), and Boot() constructor returning a Server initialized with ListenAddr. · declares `Server`, `Boot`
+- `server.go` (140 B) — Defines Server struct, ListenAddr constant ("0.0.0.0:8080"), and Boot() constructor returning a *Server. · declares `Server`, `Boot`
 
 ## Directories
 
-- `handlers/` — HTTP route handling with Router type, DefaultPrefix, NewRouter, and Handle; go there for routing or path-validity questions.
+- `handlers/` — HTTP routing via Router matching paths against a prefix; check here for route-matching or path-prefix questions.
 
 ## Structure
 
-- Boot constructs a Server initialized with ListenAddr.
-
-## Rules
-
-- ListenAddr is fixed to "0.0.0.0:8080".
-
-## Where to look
-
-- what address the api server listens on → `server.go` `ListenAddr`
-- how the api server is started → `server.go` `Boot`
-- how routes are matched or versioned → `handlers` `Router`
+- Defines Server struct, ListenAddr constant ("0.0.0.0:8080"), and Boot() constructor returning a *Server.

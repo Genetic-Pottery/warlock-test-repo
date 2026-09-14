@@ -3,16 +3,8 @@
 
 # engine
 
-The engine directory is the ledger engine's top-level module, housing the core subsystem that defines the fundamental ledger data types, account balance utilities, and hashing primitives.
+Container directory whose core/ subdirectory holds financial primitives: ledger entries, postings, settlement checks, and a hash utility.
 
 ## Directories
 
-- `core/` — Ledger core types and utilities: entries, postings, Money, hashing, and account/balance constants like VAULT_LIMIT and is_settled.
-
-## Where to look
-
-- how many accounts the vault can hold → `core` `VAULT_LIMIT`
-- checking if the ledger is fully settled → `core` `is_settled`
-- creating or posting a ledger entry → `core` `Entry`
-- computing a hash of raw bytes → `core` `hash`
-- what currency the ledger defaults to → `core` `DEFAULT_CURRENCY`
+- `core/` — Ledger entries/postings, account balance/settlement checks, and a byte-slice hash utility; go here for financial primitives.

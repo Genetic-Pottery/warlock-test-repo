@@ -3,18 +3,14 @@
 
 # pipeline
 
-The pipeline directory holds the Pipeline subsystem's stage logic, defining a single processing stage that reduces a list of items into a summed value.
+Contains Pipeline.Stage, a single pipeline stage that sums items via run/1, plus its ExUnit tests.
 
 ## Files
 
-- `stage.ex` (193 B) — Defines Pipeline.Stage with run/1, which reduces items by summing them, and a private normalise/1 helper that currently passes items through unchanged. · declares `Pipeline.Stage`, `run`, `normalise`
-- `stage_test.exs` (272 B) — Pipeline.StageTest, tests for run/1 covering that it sums the items it is given.
+- `stage.ex` (193 B) — Pipeline.Stage: one pipeline stage; run/1 sums items via Enum.reduce, private normalise/1 passes items through unchanged. · declares `Pipeline.Stage`, `run`, `normalise`
+- `stage_test.exs` (272 B) — ExUnit tests for Pipeline.Stage's run/1, covering summing of given items.
 
 ## Structure
 
-- run/1 uses Enum.reduce to sum items, starting from an accumulator of 0
-- stage_test.exs exercises Pipeline.Stage's run/1 function
-
-## Where to look
-
-- how items are combined in a pipeline stage → `stage.ex` `run`
+- Pipeline.Stage: one pipeline stage; run/1 sums items via Enum.reduce, private normalise/1 passes items through unchanged.
+- ExUnit tests for Pipeline.Stage's run/1, covering summing of given items.

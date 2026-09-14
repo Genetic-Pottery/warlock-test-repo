@@ -3,30 +3,18 @@
 
 # src
 
-Top-level source directory of the web app, holding a small API client and a legacy retry utility alongside the components subsystem for the shopping cart UI.
+Top-level source directory holding API access and legacy retry utilities used elsewhere in the codebase.
 
 ## Files
 
-- `api.ts` (130 B) — Defines BASE_URL constant and async fetchCart(id) function that returns the given id. · declares `BASE_URL`, `fetchCart`
-- `legacy.js` (145 B) — Defines RETRY_LIMIT constant and retry(fn) helper that calls fn up to RETRY_LIMIT times; exports both via module.exports. · declares `RETRY_LIMIT`, `retry`
+- `api.ts` (130 B) — Defines BASE_URL constant and async fetchCart(id) stub returning the id as a string. · declares `BASE_URL`, `fetchCart`
+- `legacy.js` (145 B) — Defines RETRY_LIMIT constant and retry(fn) helper that calls fn up to RETRY_LIMIT times; exports { retry, RETRY_LIMIT }. · declares `RETRY_LIMIT`, `retry`
 
 ## Directories
 
-- `components/` — Cart component logic: Cart class, CartLine/CartState types, cartState() derivation, and its tests.
+- `components/` — Holds the Cart component, its state types (CartLine, CartState), CART_LIMIT constant, and unit tests.
 
 ## Structure
 
-- retry() in legacy.js loops up to RETRY_LIMIT times invoking the passed fn
-- fetchCart in api.ts is independent of legacy.js and components, just returning the given id
-
-## Rules
-
-- retry(fn) calls fn exactly RETRY_LIMIT times, currently 3
-
-## Where to look
-
-- base URL used for API requests → `api.ts` `BASE_URL`
-- fetching a cart by id → `api.ts` `fetchCart`
-- retrying a failing function call → `legacy.js` `retry`
-- how many times an operation is retried → `legacy.js` `RETRY_LIMIT`
-- cart item logic and UI state → `components` `Cart`
+- Defines BASE_URL constant and async fetchCart(id) stub returning the id as a string.
+- Defines RETRY_LIMIT constant and retry(fn) helper that calls fn up to RETRY_LIMIT times; exports { retry, RETRY_LIMIT }.

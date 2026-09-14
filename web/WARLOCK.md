@@ -3,12 +3,8 @@
 
 # web
 
-The web app's top-level directory, containing a small API client, a legacy retry utility, and the src subdirectory holding the shopping cart component subsystem.
+Top-level web directory containing the src subdirectory, which holds API access and legacy retry utilities plus a Cart component.
 
 ## Directories
 
-- `src/` — Top-level source: api.ts client, legacy.js retry helper, and components/ cart subsystem; open for BASE_URL, fetchCart, retry, or Cart logic.
-
-## Where to look
-
-- where the app's source code lives → `src` `api.ts`
+- `src/` — Holds BASE_URL/fetchCart, RETRY_LIMIT/retry, and the Cart component; go there for API, retry, or cart questions.

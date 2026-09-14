@@ -3,14 +3,9 @@
 
 # services
 
-The services directory groups independent service subsystems: the api entry point that boots the HTTP server and its handlers, and the billing domain covering invoices, ledgers, payments, and refunds.
+Holds service-layer subsystems, grouping the HTTP API server and its routing from the billing domain types for invoices, ledgers, payments, and refunds.
 
 ## Directories
 
-- `api/` — Api service entry point with the Server type and Boot(); go there for how the service starts, its listen address, or routing questions.
-- `billing/` — Core billing domain types (Invoice, Ledger, Payment, Refund) with totaling, retry, and refund-window logic and tests; go there for billing rules or calculations.
-
-## Where to look
-
-- how the api service is started or what address it listens on → `api` `Boot`
-- how billing invoices, ledgers, payments, or refunds are limited or computed → `billing` `Invoice`
+- `api/` — HTTP server startup (Server, Boot) and route-matching handlers; check here for server config or path-prefix routing questions.
+- `billing/` — Billing domain types and tests for Invoice, Ledger, Payment, and Refund across Java, Kotlin, C#, and Swift; check here for billing logic questions.
