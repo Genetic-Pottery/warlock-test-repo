@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # Sanity-check warlock against this fixture.
 #
-# Assertions are greps, never exact text. A pass rewrites its whole document in
-# fresh wording on every run — deliberately, because preserving wording is how a
-# document preserves a lie — so nothing here can compare against a golden file.
-# What it checks instead is that specific strings are present or absent, which
-# is what actually distinguishes a working pass from a broken one.
+# Assertions are greps, never exact text. This script always runs a full pact,
+# which reuses nothing and words every line afresh, so there is no golden file
+# to compare against. What it checks instead is that specific strings are
+# present or absent, which is what distinguishes a working pass from a broken
+# one.
+#
+# A refresh is not the same and nothing here exercises it: under
+# `AboveFailure::Skip` a line is reused wherever its source file has not moved,
+# so wording does survive between runs, and so does a lie somebody typed into a
+# document by hand. Anything asserted here would pass a refresh whether or not
+# the pass still stood behind it.
 #
 #   ./check.sh            pact the fixture, then check
 #   ./check.sh --no-pact  check the documents already on disk
@@ -64,7 +70,7 @@ present "Invoice"           services/billing/WARLOCK.md "java: a class is declar
 present "Stage"             pipeline/WARLOCK.md       "elixir: a defmodule is declared"
 
 echo
-echo "== files the ladder must not skip =="
+echo "== no file is skipped, however big or binary =="
 absent  "not read by the pass" data/WARLOCK.md "the 1.7 MB inventory.json is sampled, not skipped"
 present "sku"                  data/WARLOCK.md "…and its shape reached the document"
 present "name and size only"   data/WARLOCK.md "logo.bin is not text, so it stays a name and a size"
