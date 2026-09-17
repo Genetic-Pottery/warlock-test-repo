@@ -11,11 +11,16 @@
 # `AboveFailure::Describe` and re-describes every file regardless, so the only
 # entry point that reuses anything is `warlock refresh`.
 #
-# This one costs money: a settling refresh and then three more, each a file pass
-# plus synthesis for `engine/core` and every directory above it. It needs a
-# fixture that is already pacted and a clean tree, because it puts source files
-# back with git — and the manifest back by hand, since `.warlock/` is ignored
-# here and git will neither restore nor clean it.
+# Every refresh is aimed at `engine/core` rather than at the repository root.
+# The assertions are all about that one page, and refreshing `.` describes every
+# directory above it too — four times over, for nothing this script reads. It
+# did that at first, and a machine under memory pressure killed the run.
+#
+# It still costs money: a settling refresh and then one per scenario, each a
+# file pass plus that directory's synthesis. It needs a fixture that is already
+# pacted and a clean tree, because it puts source files back with git — and the
+# manifest back by hand, since `.warlock/` is ignored here and git will neither
+# restore nor clean it.
 #
 #   ./incremental.sh
 set -uo pipefail
@@ -70,7 +75,7 @@ trap 'git checkout -- . 2>/dev/null; git clean -qfd;
       cp "$sandbox/pacts.toml.orig" "$MANIFEST"; rm -rf "$sandbox"' EXIT
 
 refresh() {
-  if ! "$WARLOCK" refresh . >/dev/null 2>&1; then
+  if ! "$WARLOCK" refresh "$SUBJECT" >/dev/null 2>&1; then
     bad "$1 (the refresh itself failed)"
     return 1
   fi
@@ -83,7 +88,7 @@ refresh() {
 # first refresh pays for every file once, and a baseline captured before that
 # would be measuring the settling rather than the reuse.
 echo "settling…"
-"$WARLOCK" refresh . >/dev/null 2>&1 || { echo "the settling refresh failed"; exit 2; }
+"$WARLOCK" refresh "$SUBJECT" >/dev/null 2>&1 || { echo "the settling refresh failed"; exit 2; }
 keep_settled
 echo
 
