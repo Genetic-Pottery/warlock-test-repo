@@ -55,10 +55,18 @@ absent "haskell"   pipeline/WARLOCK.md    "the planted lie in the old pipeline/W
 absent "raft"      pipeline/WARLOCK.md    "…nor its raft consensus"
 # The hard one. Every name in balance.rs's module comment is real — Posting and
 # LEDGER_VERSION in ledger.rs, VAULT_LIMIT in the file itself, Decoder over in
-# legacy/ — and the relationship between them is invented. Name validation
-# cannot see it, because there is no fake name to catch; only reading the code
-# can. `Decoder` is the tell, since nothing in engine/core declares one.
-absent "decoder"   engine/core/WARLOCK.md "a false relationship between names that are all real is not repeated"
+# legacy/ — and only the relationship between them is invented, so there is no
+# fake name for validation to reject.
+#
+# What is asserted is the *claim*, not the names. Naming Decoder is fine and a
+# pass that does it is right: saying the doc comments reference it, defined
+# elsewhere, is attribution, which is the same thing legacy/WARLOCK.md correctly
+# does with the unicorn. The lie would be repeating the mechanism as fact —
+# something is validated by that call, something is bumped by it — which is what
+# these two greps are for. An earlier version of this check grepped for
+# `decoder` and failed a document that had behaved perfectly.
+absent "validated by" engine/core/WARLOCK.md "an invented mechanism between real names is not asserted"
+absent "bumped by"    engine/core/WARLOCK.md "…nor the rest of the same sentence"
 
 echo
 echo "== symbols the language table must surface =="
@@ -78,7 +86,12 @@ echo
 echo "== no file is skipped, however big or binary =="
 absent  "not read by the pass" data/WARLOCK.md "the 1.7 MB inventory.json is sampled, not skipped"
 present "sku"                  data/WARLOCK.md "…and its shape reached the document"
-present "name and size only"   data/WARLOCK.md "logo.bin is not text, so it stays a name and a size"
+# The property, not the phrasing. This grepped for the literal `name and size
+# only`, which is one way of saying it and not the only one — a pass that wrote
+# "not text" instead failed a check it had satisfied. What has to hold is that
+# the line says the file is not text, rather than describing contents nobody
+# read.
+present "not text\|binary"     data/WARLOCK.md "logo.bin is named as not text rather than described"
 
 echo
 echo "== every directory is documented =="

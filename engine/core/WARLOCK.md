@@ -3,16 +3,16 @@
 
 # core
 
-Core financial primitives: ledger entries and postings, account balance/settlement checks, and a basic hash utility for byte slices.
+Core ledger primitives: account balance limits and settlement checks, a lightweight FNV-1-style hash function, and the ledger's core types, versioning, and posting validity logic.
 
 ## Files
 
-- `balance.rs` (246 B) — Defines is_settled(open: usize) -> bool, checking whether open accounts equal 0, and VAULT_LIMIT: usize = 512. · declares `is_settled`, `VAULT_LIMIT`
-- `hash.zig` (469 B) — Defines HASH_SEED constant and hash(bytes) computing a simple XOR-based u64 hash over a byte slice. · declares `HASH_SEED`, `hash`, `std`
-- `ledger.rs` (1.0 KB) — Ledger core: Entry, Side, Posting trait, Money type, LEDGER_VERSION, DEFAULT_CURRENCY, and post() for validating entries. · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount`, `macro_rules`
+- `balance.rs` (391 B) — Defines VAULT_LIMIT (512) account cap and is_settled(open) checking whether open account count is zero; doc comments reference Decoder::decode() and LEDGER_VERSION defined elsewhere. · declares `is_settled`, `VAULT_LIMIT`
+- `hash.zig` (469 B) — Defines HASH_SEED constant and hash(bytes) FNV-1-style XOR hashing function returning a u64. · declares `HASH_SEED`, `hash`, `std`
+- `ledger.rs` (1.0 KB) — Core ledger: LEDGER_VERSION, DEFAULT_CURRENCY, Posting trait, Money alias, Entry (id, amount, ::new), Side enum, post() validity check. · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount`, `macro_rules`
 
 ## Structure
 
-- Defines is_settled(open: usize) -> bool, checking whether open accounts equal 0, and VAULT_LIMIT: usize = 512.
-- Defines HASH_SEED constant and hash(bytes) computing a simple XOR-based u64 hash over a byte slice.
-- Ledger core: Entry, Side, Posting trait, Money type, LEDGER_VERSION, DEFAULT_CURRENCY, and post() for validating entries.
+- Defines VAULT_LIMIT (512) account cap and is_settled(open) checking whether open account count is zero; doc comments reference Decoder::decode() and LEDGER_VERSION defined elsewhere.
+- Defines HASH_SEED constant and hash(bytes) FNV-1-style XOR hashing function returning a u64.
+- Core ledger: LEDGER_VERSION, DEFAULT_CURRENCY, Posting trait, Money alias, Entry (id, amount, ::new), Side enum, post() validity check.

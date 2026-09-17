@@ -3,8 +3,8 @@
 
 # engine
 
-Container directory whose core/ subdirectory holds financial primitives: ledger entries, postings, settlement checks, and a hash utility.
+Holds the ledger's core subsystem, defining account limits, settlement checks, a hash function, and the ledger's fundamental types, versioning, and posting validity rules.
 
 ## Directories
 
-- `core/` — Ledger entries/postings, account balance/settlement checks, and a byte-slice hash utility; go here for financial primitives.
+- `core/` — Ledger primitives (balances, hashing, core types/versioning/posting logic); go there for VAULT_LIMIT, is_settled, hash, LEDGER_VERSION, Posting, Entry, Side, or post().
