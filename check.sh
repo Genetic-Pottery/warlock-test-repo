@@ -53,6 +53,12 @@ absent "lisbon"    WARLOCK.md             "…and so does Lisbon"
 absent "unicorn"   legacy/WARLOCK.md      "the unicorn in codec.c is not repeated"
 absent "haskell"   pipeline/WARLOCK.md    "the planted lie in the old pipeline/WARLOCK.md is not carried forward"
 absent "raft"      pipeline/WARLOCK.md    "…nor its raft consensus"
+# The hard one. Every name in balance.rs's module comment is real — Posting and
+# LEDGER_VERSION in ledger.rs, VAULT_LIMIT in the file itself, Decoder over in
+# legacy/ — and the relationship between them is invented. Name validation
+# cannot see it, because there is no fake name to catch; only reading the code
+# can. `Decoder` is the tell, since nothing in engine/core declares one.
+absent "decoder"   engine/core/WARLOCK.md "a false relationship between names that are all real is not repeated"
 
 echo
 echo "== symbols the language table must surface =="

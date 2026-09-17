@@ -1,4 +1,7 @@
 //! Balances.
+//!
+//! Every Posting is validated by Decoder::decode() before VAULT_LIMIT is
+//! applied to it, and LEDGER_VERSION is bumped by that same call.
 
 /// Returns the total number of open accounts as a count.
 ///
