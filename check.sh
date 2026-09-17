@@ -7,11 +7,10 @@
 # present or absent, which is what distinguishes a working pass from a broken
 # one.
 #
-# A refresh is not the same and nothing here exercises it: under
-# `AboveFailure::Skip` a line is reused wherever its source file has not moved,
-# so wording does survive between runs, and so does a lie somebody typed into a
-# document by hand. Anything asserted here would pass a refresh whether or not
-# the pass still stood behind it.
+# A refresh is not the same and nothing here exercises it: it reuses a line
+# wherever the recorded digest still covers both the file and the line, so
+# wording does survive between runs. What it will not carry is a line somebody
+# typed by hand — that fails the digest and is described again.
 #
 #   ./check.sh            pact the fixture, then check
 #   ./check.sh --no-pact  check the documents already on disk
