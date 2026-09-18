@@ -3,16 +3,16 @@
 
 # legacy
 
-Legacy codec module providing frame encoding via a C implementation and header, plus a separate C++ decoder for reading frames back, kept for backward compatibility.
+Legacy codec and decoder module providing frame encoding and ID-based decoding, superseded but retained for compatibility.
 
 ## Files
 
-- `codec.c` (397 B) — Legacy codec with Frame struct, CODEC_VERSION constant, and encode() for frame length totaling; tracks frames_seen count.
-- `codec.h` (110 B) — Header declaring CODEC_VERSION constant and encode(struct Frame*) for the legacy codec interface.
-- `decoder.cpp` (263 B) — Defines legacy::Decoder with decode(id), and kMaxFrames constant capping frame iteration at 1024.
+- `codec.c` (397 B) — Legacy codec: CODEC_VERSION=4, Frame struct, encode() summing 0..7 plus frame->len and bumping static frames_seen.
+- `codec.h` (110 B) — Header declaring CODEC_VERSION constant and encode(struct Frame*) function prototype for the legacy codec interface.
+- `decoder.cpp` (263 B) — Legacy Decoder class with decode(id): loops kMaxFrames counting total, returns total > id.
 
 ## Structure
 
-- Legacy codec with Frame struct, CODEC_VERSION constant, and encode() for frame length totaling; tracks frames_seen count.
-- Header declaring CODEC_VERSION constant and encode(struct Frame*) for the legacy codec interface.
-- Defines legacy::Decoder with decode(id), and kMaxFrames constant capping frame iteration at 1024.
+- Legacy codec: CODEC_VERSION=4, Frame struct, encode() summing 0..7 plus frame->len and bumping static frames_seen.
+- Header declaring CODEC_VERSION constant and encode(struct Frame*) function prototype for the legacy codec interface.
+- Legacy Decoder class with decode(id): loops kMaxFrames counting total, returns total > id.

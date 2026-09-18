@@ -3,8 +3,8 @@
 
 # tools
 
-Contains no files of its own beyond a scripts subdirectory of deployment and inventory/reporting utility scripts, specs, and tests.
+Collection of standalone operational and utility scripts covering deployment staging, inventory shelf modeling, and reporting, each paired with its own test file.
 
 ## Directories
 
-- `scripts/` — Deployment shell script plus Ruby inventory and Python report modules with their specs and tests; go here for build/deploy or inventory/report logic questions.
+- `scripts/` — Deployment, inventory, and reporting scripts; check here for deploy.sh stages, Inventory::Shelf, or Report totals.

@@ -3,8 +3,8 @@
 
 # web
 
-Top-level web directory containing the src subdirectory, which holds API access and legacy retry utilities plus a Cart component.
+Root of the web app source, holding a cart API stub and legacy retry helper, with cart UI logic and tests under components.
 
 ## Directories
 
-- `src/` — Holds BASE_URL/fetchCart, RETRY_LIMIT/retry, and the Cart component; go there for API, retry, or cart questions.
+- `src/` — Cart API stub, legacy retry helper, and Cart UI/state logic; go here for cart data fetching, retries, or Cart component behavior.

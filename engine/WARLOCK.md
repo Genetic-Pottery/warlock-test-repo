@@ -3,8 +3,8 @@
 
 # engine
 
-Holds the ledger's core subsystem, defining account limits, settlement checks, a hash function, and the ledger's fundamental types, versioning, and posting validity rules.
+Engine directory housing the core ledger subsystem: account balance limits/settlement checks, a byte-hashing utility, and the ledger entry/posting model with currency and version constants.
 
 ## Directories
 
-- `core/` — Ledger primitives (balances, hashing, core types/versioning/posting logic); go there for VAULT_LIMIT, is_settled, hash, LEDGER_VERSION, Posting, Entry, Side, or post().
+- `core/` — Look here for account balance/settlement logic, the FNV-1a hash utility, or the ledger Entry/Posting/Money model and its version and currency constants.

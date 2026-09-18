@@ -3,20 +3,20 @@
 
 # scripts
 
-Deployment and inventory/reporting utility scripts, with accompanying specs and tests for the inventory and report logic.
+Collection of standalone operational and utility scripts covering deployment staging, inventory shelf modeling, and reporting, each paired with its own test file.
 
 ## Files
 
-- `deploy.sh` (99 B) — Shell script running build, test, and ship stages in sequence for the eu-west-1 region.
-- `inventory.rb` (256 B) — Defines Inventory module with SHELF_LIMIT constant, Shelf class (count) tracking item totals, and self.build factory method. · declares `Inventory`, `Shelf`, `initialize`, `count`, `self.build`
-- `inventory_spec.rb` (252 B) — RSpec spec for Inventory::Shelf, testing item counting behavior on a shelf.
-- `report.py` (360 B) — Reporting helpers: Report class with total(), build_report()/build_report_async() constructors, REPORT_VERSION and DEFAULT_ROWS constants. · declares `build_report_async`, `Report`, `__init__`, `total`, `build_report`
-- `test_report.py` (224 B) — Test module with test_report_totals_its_rows, verifying report row-totaling logic.
+- `deploy.sh` (99 B) — POSIX shell script setting REGION=eu-west-1 and looping stages build, test, ship, echoing "running $stage" for each.
+- `inventory.rb` (256 B) — Defines Inventory module with SHELF_LIMIT constant, Shelf class (count method) and self.build factory for creating shelves from items. · declares `Inventory`, `Shelf`, `initialize`, `count`, `self.build`
+- `inventory_spec.rb` (252 B) — RSpec spec for Inventory::Shelf, testing item counting behavior.
+- `report.py` (360 B) — Reporting helpers: REPORT_VERSION, DEFAULT_ROWS, Report class with total(), build_report(rows), build_report_async(rows). · declares `build_report_async`, `Report`, `__init__`, `total`, `build_report`
+- `test_report.py` (224 B) — Test module verifying report row-totaling logic via test_report_totals_its_rows.
 
 ## Structure
 
-- Shell script running build, test, and ship stages in sequence for the eu-west-1 region.
-- Defines Inventory module with SHELF_LIMIT constant, Shelf class (count) tracking item totals, and self.build factory method.
-- RSpec spec for Inventory::Shelf, testing item counting behavior on a shelf.
-- Reporting helpers: Report class with total(), build_report()/build_report_async() constructors, REPORT_VERSION and DEFAULT_ROWS constants.
-- Test module with test_report_totals_its_rows, verifying report row-totaling logic.
+- POSIX shell script setting REGION=eu-west-1 and looping stages build, test, ship, echoing "running $stage" for each.
+- Defines Inventory module with SHELF_LIMIT constant, Shelf class (count method) and self.build factory for creating shelves from items.
+- RSpec spec for Inventory::Shelf, testing item counting behavior.
+- Reporting helpers: REPORT_VERSION, DEFAULT_ROWS, Report class with total(), build_report(rows), build_report_async(rows).
+- Test module verifying report row-totaling logic via test_report_totals_its_rows.

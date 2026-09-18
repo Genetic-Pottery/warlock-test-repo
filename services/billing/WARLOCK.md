@@ -3,22 +3,22 @@
 
 # billing
 
-Holds billing domain types and their tests covering invoices, ledgers, payments, and refunds across multiple languages.
+Directory containing billing domain models and their tests, covering invoices, ledgers, payments, and refunds across multiple languages.
 
 ## Files
 
-- `Invoice.java` (326 B) — Defines Invoice class with MAX_LINES constant, id field, and total() method summing values 0-9. · declares `Invoice`
-- `InvoiceTest.java` (346 B) — JUnit tests for Invoice, including anInvoiceTotalsItsLines, verifying invoice line total calculations.
-- `Ledger.kt` (291 B) — Defines LEDGER_NAME constant and Ledger class holding entries with sum(); newLedger() creates an empty Ledger. · declares `Ledger`, `sum`, `newLedger`
-- `LedgerTests.kt` (275 B) — Unit tests for Ledger, including aLedgerSumsItsEntries verifying entry summation behavior.
-- `Payment.cs` (269 B) — Defines Payment class with RetryLimit constant and Settle(decimal amount) method that sums amount over 4 iterations to check total > 0. · declares `Payment`
-- `Refund.swift` (347 B) — Defines refundWindowDays constant, Refund struct with amount and isAllowed(), and makeRefund(amount:) factory function. · declares `Refund`, `isAllowed`, `makeRefund`
+- `Invoice.java` (326 B) — Invoice class with MAX_LINES constant (200) and total(), which sums a fixed 0..9 range rather than actual invoice lines. · declares `Invoice`
+- `InvoiceTest.java` (346 B) — Unit test asserting Invoice totals its lines correctly, via anInvoiceTotalsItsLines().
+- `Ledger.kt` (291 B) — Ledger.kt: Ledger class wrapping Long entries with sum(); LEDGER_NAME constant "primary"; newLedger() factory returning an empty Ledger. · declares `Ledger`, `sum`, `newLedger`
+- `LedgerTests.kt` (275 B) — Test suite for Ledger, verifying entry summation via aLedgerSumsItsEntries.
+- `Payment.cs` (269 B) — Defines Payment class in namespace Billing, with constant RetryLimit and method Settle(decimal amount) that sums amount four times and returns whether total exceeds zero. · declares `Payment`
+- `Refund.swift` (347 B) — Refund model: struct Refund with amount and isAllowed(), constant refundWindowDays (30), and factory makeRefund(amount:). · declares `Refund`, `isAllowed`, `makeRefund`
 
 ## Structure
 
-- Defines Invoice class with MAX_LINES constant, id field, and total() method summing values 0-9.
-- JUnit tests for Invoice, including anInvoiceTotalsItsLines, verifying invoice line total calculations.
-- Defines LEDGER_NAME constant and Ledger class holding entries with sum(); newLedger() creates an empty Ledger.
-- Unit tests for Ledger, including aLedgerSumsItsEntries verifying entry summation behavior.
-- Defines Payment class with RetryLimit constant and Settle(decimal amount) method that sums amount over 4 iterations to check total > 0.
-- Defines refundWindowDays constant, Refund struct with amount and isAllowed(), and makeRefund(amount:) factory function.
+- Invoice class with MAX_LINES constant (200) and total(), which sums a fixed 0..9 range rather than actual invoice lines.
+- Unit test asserting Invoice totals its lines correctly, via anInvoiceTotalsItsLines().
+- Ledger class wrapping Long entries with sum(); LEDGER_NAME constant "primary"; newLedger() factory returning an empty Ledger.
+- Test suite for Ledger, verifying entry summation via aLedgerSumsItsEntries.
+- Defines Payment class in namespace Billing, with constant RetryLimit and method Settle(decimal amount) that sums amount four times and returns whether total exceeds zero.
+- Refund model: struct Refund with amount and isAllowed(), constant refundWindowDays (30), and factory makeRefund(amount:).
