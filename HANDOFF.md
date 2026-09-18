@@ -20,22 +20,22 @@ passes and then trying to break each one. The script reads as though it works.
 
 ## What is being done here
 
-1. **Delete section 4's lie checks, and the planted lies themselves.** They
-   tested a threat model warlock no longer has.
-2. **Strengthen section 2's pair**, once the engine can satisfy it.
+1. **Delete the lie checks, and the planted lies themselves.** They tested a
+   threat model warlock no longer has.
+2. **Make the over-cap pair stop lying**, now that the capability behind it is
+   parked rather than pending.
 
-That is the whole of the fixture work. It is about an hour. The engine work it
-depends on is in `../warlock/HANDOFF.md`, and that is where the session should
-go.
+That is the whole of the fixture work. It is about an hour.
 
 ## Decisions already made — do not reopen these
 
 - **Comments do not reach a pass.** The engine strips them from the text it
-  sends. A working implementation is on warlock's
-  `a-comment-is-not-a-declaration` branch, unmerged; `warlock/HANDOFF.md` says
-  what is in it and what has been checked.
-- **A file too big to send whole is still described**, not just named. Section 2
-  is engine work, not a check to weaken.
+  sends. Merged on warlock's `main`; `warlock/HANDOFF.md` says what is in it.
+- **An over-cap file stays named and sized.** This reverses what an earlier
+  draft of both documents said. The sample was started and reverted: a line
+  written from 8 KB of a 1.7 MB file is a claim warlock cannot check, and every
+  other line in a document rests on a name witnessed in the file's own tokens.
+  `warlock/HANDOFF.md` has the argument and the shape a future attempt takes.
 
 ---
 
@@ -107,9 +107,7 @@ reported `decode` as undeclared while `decoder.cpp` declares it on line nine.
 
 ---
 
-## 2. The over-cap file: the engine dropped a capability and the check hid it
-
-This is the one that matters, and the clearest case of the rule at the top.
+## 2. The over-cap file: two checks reporting a capability that is gone
 
 ```
 absent  "not read by the pass" data/WARLOCK.md "the 1.7 MB inventory.json is sampled, not skipped"
@@ -146,21 +144,28 @@ sum that need not fit, but one file either fits under `PER_FILE_BYTE_CAP` (1 MB)
 or is sent as a name and a size, with nothing to demote it in favour of.
 `inventory.json` is 1,755,356 bytes, so it is omitted.
 
-That argument is about the *ladder*, which was rightly removed. It is not an
-argument that a large file should go undescribed, and the section heading here
-says it should not. **The decision is that it should be described.** So this is
-engine work; see `warlock/HANDOFF.md` for the shape it takes, which is a head
-sample rather than a restored summariser.
+That argument is about the *ladder*, which was rightly removed, and it is not an
+argument that a large file should go undescribed. But describing it was tried
+and dropped, on a stronger objection than either side of that debate: **a line
+written from a sample is a claim about the part that was not sampled, and
+warlock cannot check it.** Every other line in a document rests on a name
+witnessed in the file's own tokens. See `warlock/HANDOFF.md`, which carries the
+argument and the shape a future attempt would take — deterministic parsing, so
+the fields come out as facts the existing check can witness.
 
-Expect these checks to fail until the engine is fixed. A failing check whose
-desire is right is the correct intermediate state — do not quiet it.
+**So the desire in the heading is not being met and is not scheduled.** That
+makes these two checks the worst kind: they report a capability that does not
+exist and is not coming.
 
-Strengthen them so they cannot pass the way the old pair did. What the line
-should carry is the file's *shape*: the fields of the records inside it. The
-first 120 bytes of `inventory.json` are enough to know it is an array of
-`{id, sku, qty}`, so a correct line names those.
+The rule at the top of this file says weakening a check needs the desire
+argued wrong, not merely inconvenient. That is not quite what happened here —
+the desire is still right, it is the only known way to satisfy it that is
+wrong — so do not silently reword these. **Delete the pair and say in the
+commit that no file is skipped is a desire warlock does not currently meet**,
+with the reason. A deleted check with a recorded reason is honest; a green
+check for a capability that was removed is what cost eleven days last time.
 
-Two traps in writing the replacement:
+If they are ever rewritten, two traps:
 
 - **Do not grep the rendered size string** (`1.6 MB`). That couples the check to
   a formatter and breaks for a reason unrelated to the property. This was tried.
