@@ -32,26 +32,13 @@ present() {
   if [ ! -f "$2" ]; then bad "$3 (no $2)"; return; fi
   if grep -qi -- "$1" "$2"; then ok "$3"; else bad "$3"; fi
 }
-# attributed PATTERN FILE MESSAGE — every line naming the thing must hand the
-# claim back to whoever made it.
-#
-# Naming a planted lie is not the failure; asserting it is. "comment claims a
-# unicorn maintains it" is a pass and a document that writes it has behaved
-# correctly — it is the same attribution the balance.rs note below defends.
-# `absent unicorn` could not tell the two apart and failed documents that were
-# right, which is the same mistake an earlier `decoder` grep made.
-#
-# The test is on the text of the surviving lines, not on an exit code: `grep -v`
-# does not agree with itself across implementations about empty input, and
-# ugrep reports a match there where GNU grep reports none — which silently
-# turns "the document never mentioned it" into a failure.
-ATTRIB='comment\|claims\|claim\|says\|asserts\|purports\|jokes\|aside\|whimsical\|facetious'
-attributed() {
-  if [ ! -f "$2" ]; then bad "$3 (no $2)"; return; fi
-  local bare
-  bare=$(grep -i -- "$1" "$2" | grep -iv -- "$ATTRIB")
-  if [ -n "$bare" ]; then bad "$3"; else ok "$3"; fi
-}
+# An `attributed` helper stood here, passing a line that named a planted lie so
+# long as it handed the claim back to the comment making it — "comment claims a
+# unicorn maintains it" counted as correct behaviour. It was the wrong rule for
+# what these documents are for. A line has ENTRY_CHARS to say which file to
+# open, and `walk.rs` has already lost a real fact to that budget; characters
+# spent attributing a joke are characters not spent routing. So the lies simply
+# must not appear, whoever is credited with them.
 
 if [ "${1:-}" != "--no-pact" ]; then
   [ -x "$WARLOCK" ] || { echo "no warlock binary at $WARLOCK (set WARLOCK=)"; exit 2; }
@@ -64,9 +51,9 @@ if [ "${1:-}" != "--no-pact" ]; then
 fi
 
 echo "== lies that must not reach a document =="
-attributed "gorilla" engine/core/WARLOCK.md "the gorilla in ledger.rs is only ever attributed"
+absent "gorilla"   engine/core/WARLOCK.md "the gorilla in ledger.rs does not reach a document"
 absent "banana"    engine/core/WARLOCK.md "…nor its bananas"
-attributed "unicorn" legacy/WARLOCK.md    "the unicorn in codec.c is only ever attributed"
+absent "unicorn"   legacy/WARLOCK.md      "the unicorn in codec.c does not reach a document"
 absent "own taxes" legacy/WARLOCK.md      "…and the rest of the joke is not carried over"
 # Six greps stood here and none of them could fail. Two were the cobol/zurich
 # mainframe in engine/core/README.md, two the penguins and Lisbon in the root
@@ -83,20 +70,23 @@ absent "own taxes" legacy/WARLOCK.md      "…and the rest of the joke is not ca
 # like a check for one the model avoids, and four of this file's passes meant
 # nothing for eleven days on the strength of it. The planted lies stay in the
 # fixture — they cost nothing and they document what the readers ignore.
+
 # The hard one, and the only planted lie that has ever reached a document. Every
 # name in balance.rs's module comment is real — Posting and LEDGER_VERSION in
 # ledger.rs, VAULT_LIMIT in the file itself, Decoder over in legacy/decoder.cpp —
 # and only the relationship between them is invented, so there is no fake name
 # for validation to reject.
 #
-# Naming Decoder is fine and a pass that does it is right: saying the doc
-# comments reference it, defined elsewhere, is attribution. Asserting the
-# mechanism is the lie. Two greps for `validated by` and `bumped by` used to
-# stand here, and they only ever caught the phrasing that had already been seen;
-# `attributed` is the same rule the gorilla and the unicorn are held to, and it
-# catches wordings nobody predicted. An earlier check grepped bare `decoder` and
-# failed a document that had behaved perfectly.
-attributed "decoder" engine/core/WARLOCK.md "an invented mechanism between real names is not asserted"
+# The grep is on engine/core and nowhere else, because Decoder is a real class
+# and legacy/WARLOCK.md names it correctly: its own document should route a
+# reader to decoder.cpp. In engine/core it routes nowhere. That is the whole
+# test — a name belongs in the document of the directory that declares it.
+#
+# Two greps for `validated by` and `bumped by` used to stand here and caught
+# only the phrasing already seen. A later `attributed` let the name through if
+# the line credited the comment, which is worse: the characters are spent either
+# way and the file they point at is not in this directory.
+absent "decoder"   engine/core/WARLOCK.md "an invented mechanism between real names is not asserted"
 
 echo
 echo "== no document leans on a name its own directory does not declare =="
@@ -115,8 +105,13 @@ echo "== no document leans on a name its own directory does not declare =="
 # The stripping is crude and stays crude. Over-stripping loses evidence and
 # costs a false alarm that a reader resolves in seconds; under-stripping lets a
 # comment count as a declaration and hides the defect this section exists for.
-DECLARED_ELSEWHERE="$ATTRIB\|elsewhere\|defined in\|declared in"
-
+#
+# There is no escape for a line that credits its source. One stood here, letting
+# a name through if the line said "comment" or "elsewhere", and a document is
+# not improved by spending its characters on a file this directory does not
+# hold: the name still routes a reader out of the directory they are reading
+# about. `## Directories` lines are the exception and are skipped below, because
+# pointing at a child is what they are for.
 decomment() {
   sed -e 's;//.*;;' -e 's;#.*;;' -e 's;--.*;;' \
       -e '/^[[:space:]]*\*/d' -e 's;/\*.*\*/;;' -e '/\/\*/,/\*\//d' "$@" | tr -d '\0'
@@ -153,7 +148,6 @@ undeclared() {
     # A ## Directories line describes what is below, so the names in it belong
     # to a child's code and are that child's document's problem, not this one's.
     [ "$section" = "## Directories" ] && continue
-    grep -qi -- "$DECLARED_ELSEWHERE" <<<"$line" && continue
     stripped=${line#*— }
     for token in $(names_used "$stripped"); do
       [ "${#token}" -lt 3 ] && continue
