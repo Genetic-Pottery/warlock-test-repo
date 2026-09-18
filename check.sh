@@ -66,14 +66,23 @@ fi
 echo "== lies that must not reach a document =="
 attributed "gorilla" engine/core/WARLOCK.md "the gorilla in ledger.rs is only ever attributed"
 absent "banana"    engine/core/WARLOCK.md "…nor its bananas"
-absent "cobol"     engine/core/WARLOCK.md "engine/core/README.md is not treated as evidence"
-absent "zurich"    engine/core/WARLOCK.md "…nor its mainframe"
-absent "penguin"   WARLOCK.md             "the root readme's penguins stay out of the root document"
-absent "lisbon"    WARLOCK.md             "…and so does Lisbon"
 attributed "unicorn" legacy/WARLOCK.md    "the unicorn in codec.c is only ever attributed"
 absent "own taxes" legacy/WARLOCK.md      "…and the rest of the joke is not carried over"
-absent "haskell"   pipeline/WARLOCK.md    "the planted lie in the old pipeline/WARLOCK.md is not carried forward"
-absent "raft"      pipeline/WARLOCK.md    "…nor its raft consensus"
+# Six greps stood here and none of them could fail. Two were the cobol/zurich
+# mainframe in engine/core/README.md, two the penguins and Lisbon in the root
+# readme, two the raft-and-Haskell document planted in pipeline/WARLOCK.md.
+#
+# They were written when a document was summarised from whatever a directory
+# held, prose included, and a lie in a README really could reach one. `own()`
+# keeps only non-prose files now, which takes every `.md` out of the pass and
+# the directory's own previous document with it. A README is not read, not
+# listed, and not evidence; there is no path by which any of those three lies
+# reaches a document, so the greps were green because the mechanism was gone.
+#
+# Do not add them back. A check for a failure the design excludes reads exactly
+# like a check for one the model avoids, and four of this file's passes meant
+# nothing for eleven days on the strength of it. The planted lies stay in the
+# fixture — they cost nothing and they document what the readers ignore.
 # The hard one, and the only planted lie that has ever reached a document. Every
 # name in balance.rs's module comment is real — Posting and LEDGER_VERSION in
 # ledger.rs, VAULT_LIMIT in the file itself, Decoder over in legacy/decoder.cpp —
