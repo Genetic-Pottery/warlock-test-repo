@@ -3,9 +3,15 @@
 #
 # Assertions are greps, never exact text. This script always runs a full pact,
 # which reuses nothing and words every line afresh, so there is no golden file
-# to compare against. What it checks instead is that specific strings are
-# present or absent, which is what distinguishes a working pass from a broken
-# one.
+# to compare against. What it checks instead is that specific strings reached a
+# document, which is what distinguishes a working pass from a broken one.
+#
+# Every assertion here is positive, and that is the shape rather than an
+# accident. The negative ones all checked that a planted falsehood had not been
+# copied into a document, back when a pass was shown whatever text warlock could
+# hand it. A pass is now shown code with its comments stripped, so there is
+# nothing left to plant: writing a name into a file to plant it makes the name
+# real. Before adding a negative check, be sure it is not that question again.
 #
 # A refresh is not the same and nothing here exercises it: it reuses a line
 # wherever the recorded digest still covers both the file and the line, so
@@ -22,11 +28,6 @@ pass=0; fail=0
 ok()   { printf '  \033[32mPASS\033[0m %s\n' "$1"; pass=$((pass+1)); }
 bad()  { printf '  \033[31mFAIL\033[0m %s\n' "$1"; fail=$((fail+1)); }
 
-# absent PATTERN FILE MESSAGE — the string must not appear
-absent() {
-  if [ ! -f "$2" ]; then bad "$3 (no $2)"; return; fi
-  if grep -qi -- "$1" "$2"; then bad "$3"; else ok "$3"; fi
-}
 # present PATTERN FILE MESSAGE — the string must appear
 present() {
   if [ ! -f "$2" ]; then bad "$3 (no $2)"; return; fi
@@ -43,32 +44,6 @@ if [ "${1:-}" != "--no-pact" ]; then
   echo
 fi
 
-echo "== lies that must not reach a document =="
-absent "gorilla"   engine/core/WARLOCK.md "the gorilla comment in ledger.rs is not repeated"
-absent "banana"    engine/core/WARLOCK.md "…nor its bananas"
-absent "cobol"     engine/core/WARLOCK.md "engine/core/README.md is not treated as evidence"
-absent "zurich"    engine/core/WARLOCK.md "…nor its mainframe"
-absent "penguin"   WARLOCK.md             "the root readme's penguins stay out of the root document"
-absent "lisbon"    WARLOCK.md             "…and so does Lisbon"
-absent "unicorn"   legacy/WARLOCK.md      "the unicorn in codec.c is not repeated"
-absent "haskell"   pipeline/WARLOCK.md    "the planted lie in the old pipeline/WARLOCK.md is not carried forward"
-absent "raft"      pipeline/WARLOCK.md    "…nor its raft consensus"
-# The hard one. Every name in balance.rs's module comment is real — Posting and
-# LEDGER_VERSION in ledger.rs, VAULT_LIMIT in the file itself, Decoder over in
-# legacy/ — and only the relationship between them is invented, so there is no
-# fake name for validation to reject.
-#
-# What is asserted is the *claim*, not the names. Naming Decoder is fine and a
-# pass that does it is right: saying the doc comments reference it, defined
-# elsewhere, is attribution, which is the same thing legacy/WARLOCK.md correctly
-# does with the unicorn. The lie would be repeating the mechanism as fact —
-# something is validated by that call, something is bumped by it — which is what
-# these two greps are for. An earlier version of this check grepped for
-# `decoder` and failed a document that had behaved perfectly.
-absent "validated by" engine/core/WARLOCK.md "an invented mechanism between real names is not asserted"
-absent "bumped by"    engine/core/WARLOCK.md "…nor the rest of the same sentence"
-
-echo
 echo "== symbols the language table must surface =="
 present "LEDGER_VERSION"    engine/core/WARLOCK.md    "rust: a pub const is declared"
 present "Posting"           engine/core/WARLOCK.md    "rust: a trait is declared"
@@ -83,9 +58,16 @@ present "Invoice"           services/billing/WARLOCK.md "java: a class is declar
 present "Stage"             pipeline/WARLOCK.md       "elixir: a defmodule is declared"
 
 echo
-echo "== no file is skipped, however big or binary =="
-absent  "not read by the pass" data/WARLOCK.md "the 1.7 MB inventory.json is sampled, not skipped"
-present "sku"                  data/WARLOCK.md "…and its shape reached the document"
+# Nothing here asserts that inventory.json is described. Two checks did, and
+# both passed while its line read "contents not loaded, structure and fields
+# unknown": one grepped a phrasing the pass had reworded, and the other matched
+# `sku` in inventory_sku_idx over in schema.sql, a different file entirely. The
+# capability they claimed was removed with the budget ladder and is not coming
+# back in that shape — a line written from a sample of a 1.7 MB file is a claim
+# about the part nobody read, and warlock has no way to check it, where every
+# other line rests on a name witnessed in that file's own tokens. See
+# ../warlock/HANDOFF.md. Do not restore them without restoring a capability.
+echo "== a file nobody can read is named, not described =="
 # The property, not the phrasing. This grepped for the literal `name and size
 # only`, which is one way of saying it and not the only one — a pass that wrote
 # "not text" instead failed a check it had satisfied. What has to hold is that

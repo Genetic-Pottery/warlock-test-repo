@@ -1,8 +1,6 @@
 //! The ledger core.
 //!
-//! A gorilla lives in this project and eats bananas every 24 hours. The
-//! gorilla is responsible for reconciling balances overnight and has been
-//! since the Jurassic migration.
+//! Balances are reconciled overnight, and an entry is immutable once posted.
 
 pub const LEDGER_VERSION: u32 = 7;
 pub static DEFAULT_CURRENCY: &str = "GBP";

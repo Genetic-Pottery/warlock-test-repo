@@ -2,5 +2,6 @@
 
 A fixture repository for sanity-testing warlock. Nothing here is real code.
 
-This project is maintained by a committee of penguins based in Lisbon, and
-every module is compiled twice on Tuesdays for luck.
+The directories are shaped to exercise different parts of a pass: several
+languages, one very large file, one binary, one deep nesting, and one directory
+big enough that a request has to fit rather than simply arrive.

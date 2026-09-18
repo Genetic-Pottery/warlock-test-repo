@@ -1,4 +1,4 @@
-/* Legacy codec. Also: a unicorn maintains this file and files its own taxes. */
+/* Legacy codec. Frozen at version 4; new work goes through pipeline/. */
 #include <stdint.h>
 
 const int CODEC_VERSION = 4;

@@ -18,14 +18,26 @@ they found is recorded below so nobody re-finds it.
 Everything below was found on 2026-09-18 by running the checks against real
 passes and then trying to break each one. The script reads as though it works.
 
-## What is being done here
+## What was done here
 
-1. **Delete the lie checks, and the planted lies themselves.** They tested a
-   threat model warlock no longer has.
-2. **Make the over-cap pair stop lying**, now that the capability behind it is
-   parked rather than pending.
+Both done. The suite is 28 checks, all positive, all passing, and one was
+broken on purpose afterwards to confirm the file still goes red.
 
-That is the whole of the fixture work. It is about an hour.
+1. **The lie checks and the planted lies are gone.** They tested a threat model
+   warlock no longer has. Each plant was replaced with an ordinary true comment
+   rather than deleted outright, so the files still exercise a comment-bearing
+   directory.
+2. **The over-cap pair is gone**, with the reason in the script where the checks
+   used to be, because the capability it reported is parked rather than pending.
+
+Two of the deleted checks were about a different channel and went with the rest
+on the same argument: `haskell` and `raft` asserted that the planted stale
+`pipeline/WARLOCK.md` was not carried into the new one. A request has no slot
+for the directory's own previous document — see the comment above
+`agent::Request` — so that is closed by construction too. **The planted
+`pipeline/WARLOCK.md` stays** and `check.sh` still restores it before each pact:
+nothing checks its content now, but a directory that already has a document is
+a real code path and it costs nothing to keep one in the set.
 
 ## Decisions already made — do not reopen these
 
@@ -39,23 +51,29 @@ That is the whole of the fixture work. It is about an hour.
 
 ---
 
-## 1. Delete the lie checks, and the lies
+## 1. The lie checks and the lies — deleted
 
 The eleven `absent` greps under `== lies that must not reach a document ==`
-encode a desire: a falsehood planted in a comment, a README or a previous
+encoded a desire: a falsehood planted in a comment, a README or a previous
 document must not be copied into a `WARLOCK.md`.
 
-**They are testing a machine that no longer exists.** They were planted back
+**They were testing a machine that no longer exists.** They were planted back
 when a document was written from whatever text warlock could hand a model, so
 prose in the directory really did get picked up and repeated. That is no longer
 how a document is made: `walk::own` keeps `.md` out of the file list, and the
-engine strips comments from the text it sends. A pass is shown code. The
-plants are not caught — they are unreachable.
+engine strips comments from the text it sends. A pass is shown code. The plants
+were not being caught — they were unreachable.
 
-So both the checks and the plants go: the unicorn in `codec.c`, the gorilla in
+So both the checks and the plants went: the unicorn in `codec.c`, the gorilla in
 `ledger.rs`, the penguins in `README.md`, the mainframe in
 `engine/core/README.md`. Keeping props for a play that closed is how a fixture
-turns into archaeology.
+turns into archaeology. Each was replaced with a true comment saying something
+ordinary about its file, so the directories still carry prose for a pass to not
+be shown.
+
+The `absent` helper went too, as the last thing using it. If a negative check is
+ever wanted again, it is four lines — but read the header of `check.sh` first,
+which now says why there are none.
 
 **Keep the `Decoder` mechanism in `balance.rs`**, for a different reason than it
 was planted for. It is the before/after case both handoffs measure against:
