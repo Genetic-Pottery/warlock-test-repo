@@ -12,6 +12,19 @@ That rule was not being followed. Everything below was found on 2026-09-18 by
 running the checks against real passes and then trying to break each one.
 Nothing here came from reading; the script reads as though it works.
 
+## Decisions already made — do not reopen these
+
+- **Comments do not reach a pass.** The engine strips them from the text it
+  sends. Section 4's lie checks therefore go; a falsehood cannot arrive.
+- **A file too big to send whole is still described**, not just named. Section 2
+  is engine work, not a check to weaken.
+- **A working implementation of the comment change exists** on warlock's
+  `a-comment-is-not-a-declaration` branch, with tests. Read it before writing
+  your own. It is not merged and not necessarily right; `warlock/HANDOFF.md`
+  says what is in it.
+
+---
+
 There are two kinds of defect, and they need opposite fixes:
 
 - **A check that cannot fail.** It reports coverage the suite does not have.
@@ -117,25 +130,26 @@ demote it in favour of. `inventory.json` is 1,755,356 bytes, so it is omitted.
 
 That argument is about the *ladder*, which was rightly removed. It is not an
 argument that a large file should go undescribed, and the section heading here
-says it should not. So this is engine work, and there is a decision to make
-first:
+says it should not. **The decision is that it should be described.** So this is
+engine work; see `warlock/HANDOFF.md` for the shape it should take, which is a
+head sample rather than a restored summariser.
 
-- **If a big file should still be described** — restore a summariser for the
-  over-cap case. Then strengthen these checks so they cannot pass on phrasing
-  or on a neighbouring file, and expect them red until the engine is fixed. A
-  red check whose desire is right is the correct intermediate state; do not
-  quiet it.
-- **If a big file should now just be named and sized** — then the desire has
-  changed, the heading is stale, and the checks should be rewritten to assert
-  that instead (`declares "inventory.json" data/WARLOCK.md`). Argue it in the
-  commit message. Do not do this silently because it is the easier road.
+Expect these checks to fail until the engine is fixed. A failing check whose
+desire is right is the correct intermediate state — do not quiet it.
 
-Whichever way it goes, the replacement check must not grep the rendered size
-string (`1.6 MB`) — that couples it to a formatter and breaks for a reason
-unrelated to the property. A stronger idea was tried and rejected: a field only
-the unsent file holds would prove invention if it appeared, but the candidate
-`qty` is declared in `data/schema.sql` too. Check any candidate against the
-whole directory first.
+Strengthen them so they cannot pass the way the old pair did. What the line
+should carry is the file's *shape*: the fields of the records inside it. The
+first 120 bytes of `inventory.json` are enough to know it is an array of
+`{id, sku, qty}`, so a correct line names those.
+
+Two traps in writing the replacement:
+
+- **Do not grep the rendered size string** (`1.6 MB`). That couples the check to
+  a formatter and breaks for a reason unrelated to the property. This was tried.
+- **Check any symbol you pick against the whole directory first.** `sku` was
+  already matched by `inventory_sku_idx` in `data/schema.sql`, and `qty` is
+  declared there too — so neither alone proves the JSON was read. Assert on
+  something only the JSON can supply, or assert on more than one field at once.
 
 ---
 
@@ -172,40 +186,41 @@ nothing.
 
 ---
 
-## 4. The lie checks — decide what the desired truth is
+## 4. The lie checks — delete the section
 
 The eleven `absent` greps under `== lies that must not reach a document ==`
 encode a desire: a falsehood planted in a comment, a README or a previous
 document must not be copied into a WARLOCK.md.
 
-Under the rule at the top, the question is not whether the engine currently
-satisfies them. It is whether the desire is still the one you want. There are
-two coherent answers and they lead to different engines:
+That desire is met by construction now, not by checking. A pass is shown code
+and nothing else — `walk::own` keeps prose out of the file list, and the engine
+strips comments from the text it sends. A name a pass reads is therefore real,
+and planting a falsehood is not possible: writing the name into a file to plant
+it makes the name real. The section goes.
 
-- **A pass may read comments and must not repeat their claims.** Then these
-  checks stay, and the engine needs a check on what a pass writes. Be warned
-  that this was attempted and has no floor: refused for a call, the pass
-  rewrote the same invention as prose with no identifier in it at all
-  (`VAULT_LIMIT = 512 applied post-decode`), and a second lie escaped as bare
-  ALL-CAPS nouns, which the engine's `referenced` skips on purpose because
-  widening it refuses most true lines. Every narrowing catches one shape.
-- **A pass is shown code and nothing else.** Then the falsehood never arrives,
-  these checks become untestable by construction — planting a name in a file
-  makes the name real — and the section goes. Measured cost of this on
-  warlock's own crates: 110 files, 2.88 MB, 30.5% of it comments, so it is also
-  cheaper. Measured effect on the line for `balance.rs`:
+Why this rather than checking the output, since the checking road was the
+obvious one and was tried: it has no floor. Refused for naming a call, the pass
+rewrote the same invention as prose with no identifier in it at all —
+`VAULT_LIMIT = 512 applied post-decode` — which no name-based check can catch.
+A second lie escaped as bare ALL-CAPS nouns, which the engine's `referenced`
+skips on purpose because widening it refuses most true lines. Every narrowing
+catches one shape and the next answer arrives in another.
 
-  ```
-  comments in : …is_settled(open) checks zero open accounts (doc claims account
-                count, actually returns bool); VAULT_LIMIT = 512 applied post-decode.
-  comments out: Defines is_settled(open: usize) checking if open == 0, and
-                VAULT_LIMIT constant set to 512.
-  ```
+Measured cost of the input fix instead: 110 files, 2.88 MB of warlock's own
+crates, 30.5% of it comments — cheaper as well as truer. Measured effect on the
+line for `balance.rs`, comments the only variable:
 
-Two of these greps cannot fail under either answer and should go regardless:
-`unicorn` and the rest of that joke. A pass that would still copy a mechanism
-out of a comment refuses a joke anyway. Six others were deleted for the same
-reason previously — see `47bfb6d`.
+```
+comments in : …is_settled(open) checks zero open accounts (doc claims account
+              count, actually returns bool); VAULT_LIMIT = 512 applied post-decode.
+comments out: Defines is_settled(open: usize) checking if open == 0, and
+              VAULT_LIMIT constant set to 512.
+```
+
+Two of these greps could never have failed anyway: `unicorn` and the rest of
+that joke. A pass that would still copy a mechanism out of a comment refuses a
+joke regardless. Six others were deleted for the same reason previously — see
+`47bfb6d`.
 
 If the section goes, leave the planted text in the fixture files — the unicorn
 in `codec.c`, the gorilla in `ledger.rs`, the penguins in `README.md`, the
