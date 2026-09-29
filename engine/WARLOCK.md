@@ -3,8 +3,8 @@
 
 # engine
 
-Engine directory holding subdirectories that implement the ledger system, including core data types, balance checks, and hashing utilities.
+Engine directory housing a core submodule that supplies foundational ledger types, hashing, and balance utilities shared across the engine.
 
 ## Directories
 
-- `core/` — Fundamental ledger types (Entry, Side, Posting, Money), balance/settlement checks, and byte hashing; go here for data model or hashing questions.
+- `core/` — Foundational ledger types, hashing, and balance helpers; go here for Entry, Side, Money, Posting, post(), is_settled, or hash questions.
