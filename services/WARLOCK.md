@@ -3,9 +3,9 @@
 
 # services
 
-Collects the backend service components: an API entry point that boots a server and routes requests, and billing types across several languages modeling invoices, ledgers, payments, and refunds.
+Parent directory grouping backend service code, holding the top-level api service and the multi-language billing domain types.
 
 ## Directories
 
-- `api/` — HTTP entry point: Server struct and Boot() bind a listen address; go there for boot or routing questions.
-- `billing/` — Multi-language billing domain types (invoices, ledgers, payments, refunds); go there for billing logic or validation questions.
+- `api/` — Server struct, ListenAddr, and Boot() entry point; go there for how the service starts and binds its address.
+- `billing/` — Invoice, Ledger, Payment, and Refund types with their summing/validation logic; go there for billing domain questions.
