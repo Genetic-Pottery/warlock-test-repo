@@ -3,7 +3,7 @@
 
 # api
 
-Entry point for the API service, defining the Server type and boot logic that binds it to a fixed listen address.
+Entry point for the API service, defining the Server struct and Boot() to construct a server bound to a fixed listen address.
 
 ## Files
 
@@ -11,7 +11,7 @@ Entry point for the API service, defining the Server type and boot logic that bi
 
 ## Directories
 
-- `handlers/` — HTTP routing: Router checks paths against a versioned prefix before dispatch; go there for routing or path-handling questions.
+- `handlers/` — Route registration and HTTP handlers; go here for how endpoints like /entries/reverse are wired.
 
 ## Structure
 
