@@ -3,14 +3,14 @@
 
 # handlers
 
-Provides HTTP routing for the API, defining a Router that checks request paths against a versioned prefix before dispatching.
+Defines HTTP route registration for the API, including the router type, default path prefix, and endpoint handlers such as reverse entries.
 
 ## Files
 
-- `routes.go` (298 B) — Defines Router type with prefix field, DefaultPrefix ("/v1") constant, NewRouter constructor, and Handle(path) path-check method. · declares `Router`, `NewRouter`, `Handle`
-- `routes_test.go` (312 B) — Test file with TestRouterHandlesNonEmptyPaths, verifying the router correctly handles non-empty request paths.
+- `routes.go` (522 B) — Defines route/Router types with DefaultPrefix "/v1" and NewRouter() registering POST /entries/reverse; Handle(path) just checks non-empty path, not actual routing. · declares `route`, `Router`, `NewRouter`, `Handle`
+- `routes_test.go` (312 B) — Test file with TestRouterHandlesNonEmptyPaths, verifying router behavior for non-empty request paths.
 
 ## Structure
 
-- Defines Router type with prefix field, DefaultPrefix ("/v1") constant, NewRouter constructor, and Handle(path) path-check method.
-- Test file with TestRouterHandlesNonEmptyPaths, verifying the router correctly handles non-empty request paths.
+- Defines route/Router types with DefaultPrefix "/v1" and NewRouter() registering POST /entries/reverse; Handle(path) just checks non-empty path, not actual routing.
+- Test file with TestRouterHandlesNonEmptyPaths, verifying router behavior for non-empty request paths.
