@@ -3,16 +3,16 @@
 
 # core
 
-Core defines the ledger's fundamental data types, balance checks, and a byte hashing utility used across the engine.
+Core module providing foundational ledger types, hashing, and balance utilities used across the engine.
 
 ## Files
 
 - `balance.rs` (391 B) — Tiny helper: is_settled(open: usize) -> bool checks open == 0; VAULT_LIMIT const usize = 512. · declares `is_settled`, `VAULT_LIMIT`
 - `hash.zig` (469 B) — Defines HASH_SEED (FNV-offset-like u64 1469598103934665603) and hash(bytes), a simple XOR-fold byte hash over a slice. · declares `HASH_SEED`, `hash`, `std`
-- `ledger.rs` (978 B) — Core ledger types: Entry, Side enum, Posting trait, Money alias, post() checks amount>0; LEDGER_VERSION=7, DEFAULT_CURRENCY="GBP". · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount`, `macro_rules`
+- `ledger.rs` (1.8 KB) — Defines core ledger types Entry, Side, Money, Posting trait, post(), LEDGER_VERSION, DEFAULT_CURRENCY, with tests for posting and reversal. · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `reverse`, `post`, `amount`, `macro_rules`
 
 ## Structure
 
-- balance.rs — Tiny helper: is_settled(open: usize) -> bool checks open == 0; VAULT_LIMIT const usize = 512.
-- hash.zig — Defines HASH_SEED (FNV-offset-like u64 1469598103934665603) and hash(bytes), a simple XOR-fold byte hash over a slice.
-- ledger.rs — Core ledger types: Entry, Side enum, Posting trait, Money alias, post() checks amount>0; LEDGER_VERSION=7, DEFAULT_CURRENCY="GBP".
+- Tiny helper: is_settled(open: usize) -> bool checks open == 0; VAULT_LIMIT const usize = 512.
+- Defines HASH_SEED (FNV-offset-like u64 1469598103934665603) and hash(bytes), a simple XOR-fold byte hash over a slice.
+- Defines core ledger types Entry, Side, Money, Posting trait, post(), LEDGER_VERSION, DEFAULT_CURRENCY, with tests for posting and reversal.
