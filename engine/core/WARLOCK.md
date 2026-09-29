@@ -3,16 +3,16 @@
 
 # core
 
-Core ledger primitives: account balance limits and settlement checks, a lightweight FNV-1-style hash function, and the ledger's core types, versioning, and posting validity logic.
+Core defines the ledger's fundamental data types, balance checks, and a byte hashing utility used across the engine.
 
 ## Files
 
-- `balance.rs` (391 B) — Defines VAULT_LIMIT (512) account cap and is_settled(open) checking whether open account count is zero; doc comments reference Decoder::decode() and LEDGER_VERSION defined elsewhere. · declares `is_settled`, `VAULT_LIMIT`
-- `hash.zig` (469 B) — Defines HASH_SEED constant and hash(bytes) FNV-1-style XOR hashing function returning a u64. · declares `HASH_SEED`, `hash`, `std`
-- `ledger.rs` (1.0 KB) — Core ledger: LEDGER_VERSION, DEFAULT_CURRENCY, Posting trait, Money alias, Entry (id, amount, ::new), Side enum, post() validity check. · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount`, `macro_rules`
+- `balance.rs` (391 B) — Tiny helper: is_settled(open: usize) -> bool checks open == 0; VAULT_LIMIT const usize = 512. · declares `is_settled`, `VAULT_LIMIT`
+- `hash.zig` (469 B) — Defines HASH_SEED (FNV-offset-like u64 1469598103934665603) and hash(bytes), a simple XOR-fold byte hash over a slice. · declares `HASH_SEED`, `hash`, `std`
+- `ledger.rs` (978 B) — Core ledger types: Entry, Side enum, Posting trait, Money alias, post() checks amount>0; LEDGER_VERSION=7, DEFAULT_CURRENCY="GBP". · declares `LEDGER_VERSION`, `Posting`, `Money`, `Entry`, `Side`, `new`, `post`, `amount`, `macro_rules`
 
 ## Structure
 
-- Defines VAULT_LIMIT (512) account cap and is_settled(open) checking whether open account count is zero; doc comments reference Decoder::decode() and LEDGER_VERSION defined elsewhere.
-- Defines HASH_SEED constant and hash(bytes) FNV-1-style XOR hashing function returning a u64.
-- Core ledger: LEDGER_VERSION, DEFAULT_CURRENCY, Posting trait, Money alias, Entry (id, amount, ::new), Side enum, post() validity check.
+- balance.rs — Tiny helper: is_settled(open: usize) -> bool checks open == 0; VAULT_LIMIT const usize = 512.
+- hash.zig — Defines HASH_SEED (FNV-offset-like u64 1469598103934665603) and hash(bytes), a simple XOR-fold byte hash over a slice.
+- ledger.rs — Core ledger types: Entry, Side enum, Posting trait, Money alias, post() checks amount>0; LEDGER_VERSION=7, DEFAULT_CURRENCY="GBP".

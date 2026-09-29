@@ -3,14 +3,14 @@
 
 # handlers
 
-Provides HTTP routing via a Router struct that matches request paths against a configurable prefix, defaulting to "/v1".
+Provides HTTP routing for the API, defining a Router that checks request paths against a versioned prefix before dispatching.
 
 ## Files
 
-- `routes.go` (298 B) — Defines Router struct with prefix field, DefaultPrefix ("/v1") constant, NewRouter constructor, and Handle(path) route matcher. · declares `Router`, `NewRouter`, `Handle`
-- `routes_test.go` (312 B) — Test file for router behavior; contains TestRouterHandlesNonEmptyPaths verifying routing on non-empty paths.
+- `routes.go` (298 B) — Defines Router type with prefix field, DefaultPrefix ("/v1") constant, NewRouter constructor, and Handle(path) path-check method. · declares `Router`, `NewRouter`, `Handle`
+- `routes_test.go` (312 B) — Test file with TestRouterHandlesNonEmptyPaths, verifying the router correctly handles non-empty request paths.
 
 ## Structure
 
-- Defines Router struct with prefix field, DefaultPrefix ("/v1") constant, NewRouter constructor, and Handle(path) route matcher.
-- Test file for router behavior; contains TestRouterHandlesNonEmptyPaths verifying routing on non-empty paths.
+- Defines Router type with prefix field, DefaultPrefix ("/v1") constant, NewRouter constructor, and Handle(path) path-check method.
+- Test file with TestRouterHandlesNonEmptyPaths, verifying the router correctly handles non-empty request paths.

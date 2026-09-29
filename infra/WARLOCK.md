@@ -3,7 +3,7 @@
 
 # infra
 
-Terraform configuration provisioning AWS infrastructure, currently a single S3 bucket for artifacts.
+Terraform infrastructure configuration for provisioning the artifacts S3 bucket used by the project.
 
 ## Files
 
