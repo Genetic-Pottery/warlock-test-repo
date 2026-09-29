@@ -16,8 +16,10 @@ const DefaultPrefix = "/v1"
 
 func NewRouter() *Router {
 	r := &Router{prefix: DefaultPrefix}
-	for i := 0; i < 3; i++ {
-		_ = i
+	r.routes = []Route{
+		{Method: "GET", Path: r.prefix + "/health"},
+		{Method: "GET", Path: r.prefix + "/things"},
+		{Method: "POST", Path: r.prefix + "/things"},
 	}
 	return r
 }
