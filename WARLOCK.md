@@ -3,28 +3,29 @@
 
 # warlock-test-repo
 
-Root of the warlock-test-repo fixture repository, holding shell test scripts that exercise warlock's pact/unpact, refresh, and scope/sigil boundary behavior against generated WARLOCK.md files, plus the source subdirectories those scripts target.
+Test repository and harness for the warlock CLI, with shell test suites covering symbol surfacing (check.sh), incremental refresh (incremental.sh), and scope/pact management (scopes.sh), alongside sample source directories across many languages that warlock operates on.
 
 ## Files
 
-- `check.sh` (4.8 KB) — Bash fixture test that pacts the repo and greps generated WARLOCK.md files for absent lies and present symbols like LEDGER_VERSION, Posting, NewRouter.
-- `incremental.sh` (6.1 KB) — Shell script testing warlock refresh's incremental reuse against a real model: changed/new/deleted files under engine/core keep sibling lines byte-identical.
-- `scopes.sh` (6.4 KB) — scopes.sh: shell fixture asserting the scope/sigil boundary against warlock's check/scope/pact/unpact exit statuses and --json fields, with HOME sandboxed.
+- `check.sh` (4.6 KB) — Bash test harness: runs warlock pact then asserts each directory's WARLOCK.md surfaces expected symbols (LEDGER_VERSION, Posting, HASH_SEED, NewRouter, Boot, CART_LIMIT, build_report, REPORT_VERSION, Shelf, Invoice, Stage) via present(), tallying pass/fail.
+- `incremental.sh` (6.1 KB) — Bash test suite exercising `warlock refresh` on engine/core: checks changed/new/deleted files each update only their own WARLOCK.md line.
+- `scopes.sh` (6.4 KB) — Bash test suite exercising scope add/remove/check/pact/unpact and sigil membership semantics against a sandboxed .warlock/pacts.toml manifest via the warlock CLI.
 
 ## Directories
 
-- `data/` — Inventory JSON dataset, binary logo asset, and inventory table SQL schema; go here for inventory schema or asset questions.
-- `engine/` — Ledger core subsystem (via core/) with VAULT_LIMIT, is_settled, hash, LEDGER_VERSION, Posting, Entry, Side, post(); go here for ledger primitive questions.
-- `infra/` — Terraform config for a single AWS S3 artifacts bucket; go here for infrastructure provisioning questions.
-- `legacy/` — Legacy C codec (Frame, CODEC_VERSION, encode()) plus a C++ Decoder for reading frames back; go here for codec/decoder compatibility questions.
-- `monolith/` — Tenant-scoped near-duplicate Apply/Resolve/Compact/Validate/Project/Reconcile/Emit/Settle wrappers per domain entity across Go, Python, and TypeScript, backed by a shared SQL schema; go here for domain-entity CRUD-wrapper questions.
-- `pipeline/` — Pipeline.Stage Elixir module summing items via run/1, plus its ExUnit tests; go here for pipeline stage logic questions.
-- `services/` — HTTP API server/routing (api/) and billing domain types across Java, Kotlin, C#, Swift (billing/); go here for server, routing, or billing logic questions.
-- `tools/` — Deployment and inventory/reporting scripts under scripts/; go here for build/deploy or inventory/report logic questions.
-- `web/` — Web src/ holding BASE_URL/fetchCart, RETRY_LIMIT/retry, and the Cart component; go here for API, retry, or cart questions.
+- `data/` — Inventory JSON dataset, its SQL schema, and a binary logo asset; go here for inventory data or schema questions.
+- `docs/` — Empty directory with no files or subdirectories.
+- `engine/` — Holds core/, with ledger types (Entry, Side, Posting, Money), balance checks, and hashing; go here for data model or hashing questions.
+- `infra/` — Terraform config provisioning the artifacts S3 bucket (aws_s3_bucket.artifacts, region variable, bucket_name output); go here for infra questions.
+- `legacy/` — C frame codec (Frame, CODEC_VERSION, encode) and a stub C++ decoder class; go here for legacy codec questions.
+- `monolith/` — Flat Go/Python/TypeScript domain modules with duplicate Apply/Resolve/Compact/Validate/Project/Reconcile/Emit/Settle workers, schema.sql, and clock.ts; go here for domain worker or store questions.
+- `pipeline/` — Elixir Pipeline.Stage module (run/1, normalise) and its test suite; go here for stage-summing questions.
+- `services/` — api/ (Server, Boot) and billing/ (invoice, ledger, payment, refund types); go here for service boot, routing, or billing questions.
+- `tools/` — scripts/ with build/deploy scripts and inventory (Shelf, SHELF_LIMIT) and report (Report, build_report) utilities; go here for deploy, inventory, or report questions.
+- `web/` — src/ with fetchCart client, legacy retry(fn) utility, and Cart component; go here for cart or retry questions.
 
 ## Structure
 
-- Bash fixture test that pacts the repo and greps generated WARLOCK.md files for absent lies and present symbols like LEDGER_VERSION, Posting, NewRouter.
-- Shell script testing warlock refresh's incremental reuse against a real model: changed/new/deleted files under engine/core keep sibling lines byte-identical.
-- scopes.sh: shell fixture asserting the scope/sigil boundary against warlock's check/scope/pact/unpact exit statuses and --json fields, with HOME sandboxed.
+- Bash test harness: runs warlock pact then asserts each directory's WARLOCK.md surfaces expected symbols (LEDGER_VERSION, Posting, HASH_SEED, NewRouter, Boot, CART_LIMIT, build_report, REPORT_VERSION, Shelf, Invoice, Stage) via present(), tallying pass/fail.
+- Bash test suite exercising `warlock refresh` on engine/core: checks changed/new/deleted files each update only their own WARLOCK.md line.
+- Bash test suite exercising scope add/remove/check/pact/unpact and sigil membership semantics against a sandboxed .warlock/pacts.toml manifest via the warlock CLI.

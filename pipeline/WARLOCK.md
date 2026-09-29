@@ -3,14 +3,14 @@
 
 # pipeline
 
-Contains Pipeline.Stage, a single pipeline stage that sums items via run/1, plus its ExUnit tests.
+Contains Pipeline.Stage, a module that runs a processing stage by summing the items it receives, along with its test suite.
 
 ## Files
 
-- `stage.ex` (193 B) — Pipeline.Stage: one pipeline stage; run/1 sums items via Enum.reduce, private normalise/1 passes items through unchanged. · declares `Pipeline.Stage`, `run`, `normalise`
-- `stage_test.exs` (272 B) — ExUnit tests for Pipeline.Stage's run/1, covering summing of given items.
+- `stage.ex` (193 B) — Defines Pipeline.Stage with run/1, summing items via Enum.reduce, and an unused private normalise/1 stub that returns its input unchanged. · declares `Pipeline.Stage`, `run`, `normalise`
+- `stage_test.exs` (272 B) — Test suite for Pipeline.Stage's run/1, verifying it sums the items it receives.
 
 ## Structure
 
-- Pipeline.Stage: one pipeline stage; run/1 sums items via Enum.reduce, private normalise/1 passes items through unchanged.
-- ExUnit tests for Pipeline.Stage's run/1, covering summing of given items.
+- Defines Pipeline.Stage with run/1, summing items via Enum.reduce, and an unused private normalise/1 stub that returns its input unchanged.
+- Test suite for Pipeline.Stage's run/1, verifying it sums the items it receives.

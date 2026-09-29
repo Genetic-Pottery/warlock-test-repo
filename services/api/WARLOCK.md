@@ -3,16 +3,16 @@
 
 # api
 
-Defines the Server struct and its Boot() constructor for starting the HTTP server, listening on 0.0.0.0:8080 by default.
+Entry point for the API service, defining the Server type and boot logic that binds it to a fixed listen address.
 
 ## Files
 
-- `server.go` (140 B) — Defines Server struct, ListenAddr constant ("0.0.0.0:8080"), and Boot() constructor returning a *Server. · declares `Server`, `Boot`
+- `server.go` (140 B) — Defines Server struct{addr}, ListenAddr constant "0.0.0.0:8080", and Boot() constructing a Server bound to that address. · declares `Server`, `Boot`
 
 ## Directories
 
-- `handlers/` — HTTP routing via Router matching paths against a prefix; check here for route-matching or path-prefix questions.
+- `handlers/` — HTTP routing: Router checks paths against a versioned prefix before dispatch; go there for routing or path-handling questions.
 
 ## Structure
 
-- Defines Server struct, ListenAddr constant ("0.0.0.0:8080"), and Boot() constructor returning a *Server.
+- Defines Server struct{addr}, ListenAddr constant "0.0.0.0:8080", and Boot() constructing a Server bound to that address.
