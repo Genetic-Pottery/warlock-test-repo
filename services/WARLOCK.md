@@ -3,9 +3,9 @@
 
 # services
 
-Collection of backend service components: the API entry point binding a server to a listen address, and billing domain types across multiple languages modeling invoices, ledgers, payments, and refunds.
+Top-level directory grouping backend service subsystems, currently the API server and billing domain types.
 
 ## Directories
 
-- `api/` — API service entry point defining Server and Boot(); go here for the listen address or how the server is constructed.
-- `billing/` — Multi-language billing types (Invoice, Ledger, Payment, Refund); go here for how amounts are summed or validated.
+- `api/` — Server binding and boot logic on 0.0.0.0:8080; check here for routing or server startup questions.
+- `billing/` — Invoice, Ledger, Payment, and Refund types across Java, Kotlin, C#, Swift; check here for billing domain logic.

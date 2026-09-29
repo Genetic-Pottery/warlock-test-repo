@@ -3,7 +3,7 @@
 
 # api
 
-Entry point for the API service, defining the Server struct and Boot() to construct a server bound to a fixed listen address.
+Top-level API service directory defining the server that binds and boots on 0.0.0.0:8080.
 
 ## Files
 
@@ -11,7 +11,7 @@ Entry point for the API service, defining the Server struct and Boot() to constr
 
 ## Directories
 
-- `handlers/` — Route registration and HTTP handlers; go here for how endpoints like /entries/reverse are wired.
+- `handlers/` — Route definitions and matching for HTTP endpoints under "/v1"; check here for request routing questions.
 
 ## Structure
 
