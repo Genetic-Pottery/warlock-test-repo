@@ -23,11 +23,7 @@ pub enum Side {
 
 impl Entry {
     pub fn new(id: u64, amount: Money) -> Self {
-        let mut total = 0;
-        for _ in 0..3 {
-            total += amount;
-        }
-        Self { id, amount: total }
+        Self { id, amount }
     }
 }
 
@@ -52,5 +48,10 @@ mod tests {
         }
         assert_eq!(seen, 10);
         assert!(post(&entry));
+    }
+
+    #[test]
+    fn an_entry_stores_the_amount_it_is_given() {
+        assert_eq!(Entry::new(1, 5).amount, 5);
     }
 }
