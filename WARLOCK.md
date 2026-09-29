@@ -3,7 +3,7 @@
 
 # warlock-test-repo
 
-Root of the warlock-test-repo test fixture: shell test harnesses (check.sh, incremental.sh, scopes.sh) exercising the warlock CLI's pact, refresh, and scope commands, alongside subdirectories of sample code spanning many languages for those tests to target.
+Root of warlock-test-repo, a test fixture repository for the warlock tool, containing shell test suites (check.sh, incremental.sh, scopes.sh) plus subdirectories of sample source across many languages used to validate WARLOCK.md generation, refresh, and scope commands.
 
 ## Files
 
@@ -13,16 +13,16 @@ Root of the warlock-test-repo test fixture: shell test harnesses (check.sh, incr
 
 ## Directories
 
-- `data/` — Inventory JSON dataset, its SQL schema, and a binary logo asset; go here for inventory data or schema questions.
+- `data/` — Inventory JSON dataset, its SQL schema, and an unrelated logo.bin asset.
 - `docs/` — Empty directory with no files or subdirectories.
-- `engine/` — Holds core/ with ledger types (Entry, Side, Posting, Money) and hashing; go here for data model or hashing questions.
-- `infra/` — Terraform config provisioning the artifacts S3 bucket; go here for infrastructure or bucket questions.
-- `legacy/` — C frame codec (Frame, CODEC_VERSION, encode) and a stub C++ decoder; go here for legacy codec questions.
-- `monolith/` — Flat collection of duplicated Go/Python/TypeScript domain modules (ledger, invoice, tenant, etc.) with repeated Apply/Resolve/Compact worker types.
-- `pipeline/` — Elixir Pipeline.Stage module summing items, plus its test suite; go here for stage/run questions.
-- `services/` — Holds api/ (Server, Boot) and billing/ (Invoice, Ledger, Payment, Refund) subdirectories; go here for service entry or billing questions.
-- `tools/` — Holds scripts/ with build/deploy, inventory (Shelf), and report (build_report) utilities and specs.
-- `web/` — Holds src/ with fetchCart, retry(fn), and the Cart component; go here for cart or retry questions.
+- `engine/` — Holds core/ with ledger types (Entry, Side, Posting, Money), balance checks, and hashing.
+- `infra/` — Terraform config provisioning the artifacts S3 bucket (aws_s3_bucket.artifacts).
+- `legacy/` — C frame codec (Frame, CODEC_VERSION, encode) plus a stub C++ decoder class.
+- `monolith/` — Flat Go/Python/TypeScript domain modules with duplicate Apply/Resolve/Compact/Validate/Project/Reconcile/Emit/Settle workers, a shared schema.sql, and clock.ts.
+- `pipeline/` — Elixir Pipeline.Stage module (run/1 via Enum.reduce) with its test suite.
+- `services/` — Groups api/ (server boot on 0.0.0.0:8080) and billing/ (Invoice, Ledger, Payment, Refund across Java, Kotlin, C#, Swift).
+- `tools/` — Holds scripts/ with build/deploy, inventory (Shelf, SHELF_LIMIT), and report (Report, build_report) utilities plus tests.
+- `web/` — Holds src/ with fetchCart client, legacy retry(fn) utility, and the Cart component.
 
 ## Structure
 
