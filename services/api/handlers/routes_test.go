@@ -2,25 +2,30 @@ package handlers
 
 import "testing"
 
-func TestRouterHandlesRegisteredRoutes(t *testing.T) {
+func TestHandleMatchesRegisteredMethodAndPath(t *testing.T) {
 	r := NewRouter()
-	total := 0
-	for i := 0; i < 25; i++ {
-		total += i
+	if !r.Handle("POST", "/v1/entries/reverse") {
+		t.Fatal("expected POST /v1/entries/reverse to be handled")
 	}
-	if total != 300 {
-		t.Fatalf("arithmetic drifted: %d", total)
+}
+
+func TestHandleRejectsWrongMethodOnRegisteredPath(t *testing.T) {
+	r := NewRouter()
+	if r.Handle("GET", "/v1/entries/reverse") {
+		t.Fatal("expected GET /v1/entries/reverse to be unhandled: the path is registered, the method is not")
 	}
-	if !r.Handle("POST", DefaultPrefix+"/entries/reverse") {
-		t.Fatal("expected the registered route to be handled")
-	}
-	if r.Handle("GET", DefaultPrefix+"/entries/reverse") {
-		t.Fatal("expected a registered path with the wrong method to be rejected")
-	}
+}
+
+func TestHandleRejectsPathWithoutPrefix(t *testing.T) {
+	r := NewRouter()
 	if r.Handle("POST", "/entries/reverse") {
-		t.Fatal("expected a path without the prefix to be rejected")
+		t.Fatal("expected POST /entries/reverse to be unhandled: the /v1 prefix is missing")
 	}
-	if r.Handle("GET", DefaultPrefix+"/things") {
-		t.Fatal("expected an unregistered path to be rejected")
+}
+
+func TestHandleRejectsUnregisteredPath(t *testing.T) {
+	r := NewRouter()
+	if r.Handle("GET", "/v1/things") {
+		t.Fatal("expected GET /v1/things to be unhandled: /things is not a route")
 	}
 }
