@@ -68,13 +68,38 @@ field() {
   [ "$got" = "$3" ] && ok "$4" || bad "$4 (.$2 was $got, wanted $3)"
 }
 
+# record NAME — the flags a scope name nothing records yet has to be added with.
+# One word each, so the unquoted `$(record …)` splits where it should.
+record() { printf -- '--team-key GEN --review-state Review --label %s' "$1"; }
+
+# hook PATH — what a `PreToolUse` hook gets back for an `Edit` of PATH: `deny`,
+# or nothing when the write is allowed.
+hook() {
+  printf '{"tool_name":"Edit","tool_input":{"file_path":"%s"}}' "$PWD/$1" |
+    "$WARLOCK" check --gate 2>/dev/null |
+    jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null
+}
+
+# decision PATH EXPECTED MESSAGE
+decision() {
+  local got
+  got=$(hook "$1")
+  [ "$got" = "$2" ] && ok "$3" || bad "$3 (hook said \"$got\", wanted \"$2\")"
+}
+
+# The fixture's root carries the `warlock-test` scope that `pull` files under,
+# and every check below is written against an unscoped root. The scope is lifted
+# here, inside the sandbox, and comes back with the rest of the manifest on exit.
+holds "warlock-test"
+"$WARLOCK" scope remove . >/dev/null 2>&1 || { echo "could not lift the root scope"; exit 2; }
+
 echo "== holding nothing, an unscoped path is open to anyone =="
 holds ""
 field . scope null "nothing scopes the root"
 field . opens true "…so this machine may work there"
 status 0 "a check answers even when it says no" -- "$WARLOCK" check legacy --json
 status 0 "a scope can be written where nothing scopes yet" -- \
-  "$WARLOCK" scope add legacy test-scope
+  "$WARLOCK" scope add legacy test-scope $(record test-scope)
 checkpoint
 
 echo
@@ -94,22 +119,34 @@ status 3 "refresh is refused before it walks a directory" -- "$WARLOCK" refresh 
 unchanged "and the manifest is byte-identical after all five"
 
 echo
+echo "== the gate a pull's sessions are fenced by refuses it too =="
+status 3 "check --gate refuses a closed scope with the boundary's 3" -- \
+  "$WARLOCK" check legacy --gate
+status 0 "and passes an unscoped path" -- "$WARLOCK" check docs --gate
+decision legacy/main.py deny "the hook denies an edit inside the closed scope"
+decision docs/README.md "" "and allows one outside it"
+status 0 "a hook exits 0 even when it denies" -- \
+  sh -c "printf '%s' '{\"tool_input\":{\"file_path\":\"$PWD/legacy/x\"}}' | \"$WARLOCK\" check --gate"
+
+echo
 echo "== the sigil is what opens it =="
 holds "test-scope"
 field legacy sigils '["test-scope"]' "the sigil is held for this repository"
 field legacy opens true "and it opens the scope"
+decision legacy/main.py "" "the hook allows the edit it denied"
 status 0 "the write that was refused now goes through" -- "$WARLOCK" scope remove legacy
 checkpoint
 
 echo
 echo "== a scope covers everything beneath it until a nearer one overrides =="
-status 0 "services takes a scope" -- "$WARLOCK" scope add services warlock-team
+status 0 "services takes a scope" -- \
+  "$WARLOCK" scope add services warlock-team $(record warlock-team)
 field services/api/handlers scope '"warlock-team"' "the scope reaches two directories down"
 field services/api/handlers opens false "and closes it to a machine holding the wrong sigil"
 holds "warlock-team"
 field services/api/handlers opens true "the right sigil opens it at depth"
 status 0 "a nearer scope may be written from inside an open one" -- \
-  "$WARLOCK" scope add services/api inner-scope
+  "$WARLOCK" scope add services/api inner-scope $(record inner-scope)
 field services/api/handlers scope '"inner-scope"' "the nearer scope is the one that applies"
 field services/api/handlers opens false "…on its own, so the held outer one does not help"
 field services scope '"warlock-team"' "and the outer scope still covers what is above it"
