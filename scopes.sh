@@ -20,7 +20,7 @@
 #   ./scopes.sh
 set -uo pipefail
 
-WARLOCK="${WARLOCK:-../warlock/target/release/warlock}"
+WARLOCK="${WARLOCK:-$(command -v warlock)}"
 MANIFEST=.warlock/pacts.toml
 pass=0; fail=0
 
