@@ -25,10 +25,10 @@
 #   ./incremental.sh
 set -uo pipefail
 
-WARLOCK="${WARLOCK:-../warlock/target/release/warlock}"
+WARLOCK="${WARLOCK:-$(command -v warlock)}"
 MANIFEST=.warlock/pacts.toml
 SUBJECT=engine/core
-DOC="$SUBJECT/WARLOCK.md"
+DOC="$SUBJECT/.warlock.md"
 pass=0; fail=0
 
 ok()  { printf '  \033[32mPASS\033[0m %s\n' "$1"; pass=$((pass+1)); }
@@ -61,7 +61,7 @@ cp "$MANIFEST" "$sandbox/pacts.toml.orig"
 # Between scenarios, back to the *settled* tree rather than the committed one —
 # documents and manifest together, because they are only meaningful as a pair.
 keep_settled() {
-  find . -name WARLOCK.md -not -path './.git/*' -print0 \
+  find . -name .warlock.md -not -path './.git/*' -print0 \
     | tar --null -cf "$sandbox/settled.tar" -T - "$MANIFEST"
 }
 revert() {

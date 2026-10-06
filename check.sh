@@ -22,7 +22,7 @@
 #   ./check.sh --no-pact  check the documents already on disk
 set -uo pipefail
 
-WARLOCK="${WARLOCK:-../warlock/target/release/warlock}"
+WARLOCK="${WARLOCK:-$(command -v warlock)}"
 pass=0; fail=0
 
 ok()   { printf '  \033[32mPASS\033[0m %s\n' "$1"; pass=$((pass+1)); }
@@ -37,25 +37,25 @@ present() {
 if [ "${1:-}" != "--no-pact" ]; then
   [ -x "$WARLOCK" ] || { echo "no warlock binary at $WARLOCK (set WARLOCK=)"; exit 2; }
   rm -rf .warlock
-  find . -name WARLOCK.md -not -path ./.git/\* -delete
-  git checkout -- pipeline/WARLOCK.md 2>/dev/null || true
+  find . -name .warlock.md -not -path ./.git/\* -delete
+  git checkout -- pipeline/.warlock.md 2>/dev/null || true
   echo "pacting…"
   "$WARLOCK" pact . || echo "(pact reported failures — the checks below say what survived)"
   echo
 fi
 
 echo "== symbols the language table must surface =="
-present "LEDGER_VERSION"    engine/core/WARLOCK.md    "rust: a pub const is declared"
-present "Posting"           engine/core/WARLOCK.md    "rust: a trait is declared"
-present "HASH_SEED"         engine/core/WARLOCK.md    "zig: a pub const is declared"
-present "NewRouter"         services/api/handlers/WARLOCK.md "go: a func is declared"
-present "Boot"              services/api/WARLOCK.md   "go: a func in the parent directory is declared"
-present "CART_LIMIT"        web/src/components/WARLOCK.md "typescript: an exported const is declared"
-present "build_report"      tools/scripts/WARLOCK.md  "python: a def is declared"
-present "REPORT_VERSION"    tools/scripts/WARLOCK.md  "python: a module const is declared"
-present "Shelf"             tools/scripts/WARLOCK.md  "ruby: a class is declared"
-present "Invoice"           services/billing/WARLOCK.md "java: a class is declared"
-present "Stage"             pipeline/WARLOCK.md       "elixir: a defmodule is declared"
+present "LEDGER_VERSION"    engine/core/.warlock.md    "rust: a pub const is declared"
+present "Posting"           engine/core/.warlock.md    "rust: a trait is declared"
+present "HASH_SEED"         engine/core/.warlock.md    "zig: a pub const is declared"
+present "NewRouter"         services/api/handlers/.warlock.md "go: a func is declared"
+present "Boot"              services/api/.warlock.md   "go: a func in the parent directory is declared"
+present "CART_LIMIT"        web/src/components/.warlock.md "typescript: an exported const is declared"
+present "build_report"      tools/scripts/.warlock.md  "python: a def is declared"
+present "REPORT_VERSION"    tools/scripts/.warlock.md  "python: a module const is declared"
+present "Shelf"             tools/scripts/.warlock.md  "ruby: a class is declared"
+present "Invoice"           services/billing/.warlock.md "java: a class is declared"
+present "Stage"             pipeline/.warlock.md       "elixir: a defmodule is declared"
 
 echo
 # Nothing here asserts that inventory.json is described. Two checks did, and
@@ -73,14 +73,14 @@ echo "== a file nobody can read is named, not described =="
 # "not text" instead failed a check it had satisfied. What has to hold is that
 # the line says the file is not text, rather than describing contents nobody
 # read.
-present "not text\|binary"     data/WARLOCK.md "logo.bin is named as not text rather than described"
+present "not text\|binary"     data/.warlock.md "logo.bin is named as not text rather than described"
 
 echo
 echo "== every directory is documented =="
 for d in . engine engine/core services services/api services/api/handlers \
          services/billing web web/src web/src/components tools tools/scripts \
          pipeline infra legacy data; do
-  [ -f "$d/WARLOCK.md" ] && ok "$d has a document" || bad "$d has no document"
+  [ -f "$d/.warlock.md" ] && ok "$d has a document" || bad "$d has no document"
 done
 
 echo
