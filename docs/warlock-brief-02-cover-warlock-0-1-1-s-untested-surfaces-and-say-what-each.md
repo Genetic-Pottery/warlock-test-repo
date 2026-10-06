@@ -126,7 +126,7 @@ After `./run.sh --paid`, `warlock check . --json` still reports `"scope": "warlo
 
 ## Scope
 
-### 1. surfaces.sh
+### 1. `surfaces.sh`
 
 depends_on: []
 
@@ -138,7 +138,7 @@ The status section runs a listing from a `mktemp -d` outside any repository for 
 
 One suite rather than two, because both halves need the same sandbox discipline — a gitignored file under `.warlock/` restored by hand, `HOME` redirected so `warlock config` cannot overwrite the sigils the operator really holds — and writing that twice means getting it subtly different twice. The alternative weighed was a `lib.sh` shared by all five suites, rejected because a suite then stops being one file somebody can read top to bottom, and because `incremental.sh`'s header comments are the best documentation in this repository and would be split from the code they explain. A later edit must not move the restore out of the `EXIT` trap, must not drop the `HOME` redirect, and must not let a `push` lose its `--dry-run`: that is the line between a suite that costs seconds and one that costs money or writes to a board.
 
-### 2. The .warlockignore scenario in incremental.sh
+### 2. The `.warlockignore` scenario in `incremental.sh`
 
 depends_on: []
 
@@ -148,7 +148,7 @@ Add a fourth scenario after the deleted-file one. It creates a file in `engine/c
 
 Creating the ignore inside the scenario rather than committing it at the root is the decision here. A committed `.warlockignore` is in force for every run, including `check.sh`'s pact, where `engine/core` is the source of the `LEDGER_VERSION`, `Posting` and `HASH_SEED` assertions — so an ignore naming anything in there can turn a passing symbol check into a FAIL that is the fixture's doing rather than warlock's. It would also shift the settled baselines the three existing scenarios compare against. A later edit must not commit `.warlockignore`, must not reorder the create-refresh-assert-edit-assert sequence, must not add a refresh between the edit and the second assertion, and must not widen the assertions to `.`.
 
-### 3. check.sh keeps the ledger and the scopes, and run.sh fronts the lot
+### 3. `check.sh` keeps the scopes, and `run.sh` fronts the lot
 
 depends_on: [1, 2]
 
