@@ -1,8 +1,8 @@
 # Cover warlock 0.1.1's untested surfaces and say what each suite spends
 
-`check.sh`, `scopes.sh` and `incremental.sh` exercise `pact`, `refresh`, `scope`, `check`, `config` and `unpact`. Nothing exercises the rest. `warlock stale` and `warlock fresh` are never run — `incremental.sh` calls `stale` only as an emptiness test at line 105, and no suite reads either listing's `--json` form or checks that `unpact` takes a directory out of both. The exit-status table is covered only at 0 and 3, both inside `scopes.sh`; status 1 for "could not answer" and status 2 for a usage error have no assertion anywhere. `.warlockignore` is not written, read or mentioned in the fixture. Neither is the `brief` → `push` → `draft` → `pull` path, which is most of what 0.1.1 does: the brief in `docs/warlock-brief-01-fix-entry-new-s-tripled-amount-add-entry-reverse-and-give.md` and the ledger in `.warlock/filed.toml` are the residue of a hand-run, and no script touches either. A regression in any of those surfaces is found by a person noticing, not by a FAIL line.
+`check.sh`, `scopes.sh` and `incremental.sh` exercise `pact`, `refresh`, `scope`, `check`, `config` and `unpact`. Nothing exercises the rest. `warlock stale` and `warlock fresh` are never run — `incremental.sh` calls `stale` only as an emptiness test at line 105, and no suite reads either listing's `--json` form or checks that `unpact` takes a directory out of both. The exit-status table is covered only at 0 and 3, both inside `scopes.sh`; status 1 for "could not answer" and status 2 for a usage error have no assertion anywhere. `.warlockignore` is not written, read or mentioned in the fixture. Neither is the `brief` → `push` → `draft` → `pull` path, which is most of what 0.1.1 does: the brief in `docs/warlock-brief-01-fix-entry-new-s-tripled-amount-add-entry-reverse-and-give.md` is the residue of a hand-run, and no script touches it. A regression in any of those surfaces is found by a person noticing, not by a FAIL line.
 
-`check.sh` makes it worse than untested. Line 39 runs `rm -rf .warlock` before pacting, which deletes `.warlock/filed.toml` — the record tying `docs/warlock-brief-01-…` to its Linear project — along with the `[[scope]]` records for `warlock-test` and `infra-ops` at lines 240-250 of the manifest and the `scope` lines they are referenced from, on `.` at line 6 and on `infra` at line 50. Running `check.sh` therefore breaks `scopes.sh`, which requires the root scope at its line 93, and breaks any later `push` or `pull` against `warlock-test`, which no longer resolves to a board. The suite that proves warlock works is the one that leaves the fixture unable to be pushed from.
+`check.sh` makes it worse than untested. Line 39 runs `rm -rf .warlock` before pacting, which deletes the `[[scope]]` records for `warlock-test` and `infra-ops` at lines 240-250 of the manifest and the `scope` lines they are referenced from, on `.` at line 6 and on `infra` at line 50. Running `check.sh` therefore breaks `scopes.sh`, which requires the root scope at its line 93, and breaks any later `push` or `pull` against `warlock-test`, which no longer resolves to a board. The suite that proves warlock works is the one that leaves the fixture unable to be pushed from.
 
 The second gap is cost. `README.md` is six lines and says nothing about what running anything costs. `check.sh` pacts 16 directories and `incremental.sh` pays for a settling refresh plus one per scenario; both facts live in comment headers, so learning them means reading three scripts before running one. There is no entry point, so a release check is three commands typed from memory, in an order that matters — `scopes.sh` and `incremental.sh` both exit 2 unless `check.sh` pacted the fixture first. Someone checking a release either spends tokens they did not intend to or skips a suite and does not notice.
 
@@ -40,7 +40,7 @@ run them with ./run.sh --paid
 
 `git status --porcelain` is empty afterwards, and `.warlock/pacts.toml` is byte-identical to what it was before the run.
 
-After `./run.sh --paid`, `diff` between a copy of `.warlock/filed.toml` taken beforehand and the file on disk prints nothing, and `warlock check . --json` still reports `"scope": "warlock-test"`.
+After `./run.sh --paid`, `warlock check . --json` still reports `"scope": "warlock-test"`.
 
 ## Success criteria
 
@@ -74,7 +74,6 @@ After `./run.sh --paid`, `diff` between a copy of `.warlock/filed.toml` taken be
 
 **`check.sh` preserves what it does not create**
 
-- `.warlock/filed.toml` is byte-identical before and after `./run.sh --paid`.
 - The `[[scope]]` records for `warlock-test` and `infra-ops` are byte-identical before and after `./run.sh --paid`.
 - After `./run.sh --paid`, `warlock check . --json` reports `"scope": "warlock-test"` and `warlock check infra --json` reports `"scope": "infra-ops"`.
 - When `check.sh` cannot put one of them back, it names on stdout which record it dropped and exits non-zero.
@@ -111,13 +110,13 @@ After `./run.sh --paid`, `diff` between a copy of `.warlock/filed.toml` taken be
 - Assertions in `surfaces.sh` are exit statuses and `--json` fields, never prose. Prose is free to be reworded between releases and is not the contract.
 - The 18 `.warlock.md` documents are left alone. They are stale after the 0.1.1 rename, including the root one that still names `pacts.toml` as the manifest and `WARLOCK.md` as the document, and `warlock refresh .` is the operator's step.
 - The existing suite names and their `WARLOCK` override, `ok`/`bad` helpers and `checks: N passed` footer stay as they are. `run.sh` reads their exit statuses and nothing else.
-- `check.sh` keeps pacting from nothing. Preserving `filed.toml` and the scope records means carrying them across the pact, not teaching the pact to spare them.
+- `check.sh` keeps pacting from nothing. Preserving the scope records means carrying them across the pact, not teaching the pact to spare them.
 
 ## Out of scope
 
 **Status 4.** The "partly done" status needs a run that completed some directories and failed others, which means a model pass, so it cannot sit in a free suite. Provoking it with a stub binary would test the stub.
 
-**A suite for `draft` and `pull`.** Both write to the GEN board or read `.warlock/filed.toml`'s record of a real Linear project. A suite over them either leaves the board different from how it found it or asserts against a project id that can be deleted out from under it. That path stays a hand exercise, and this brief is that exercise.
+**A suite for `draft` and `pull`.** Both read and write the GEN board, and warlock 0.1.1 keeps no local record of either: the URL a push prints and the comments a draft leaves on the project are the whole record. A suite over them either leaves the board different from how it found it or asserts against a project that can be deleted out from under it. That path stays a hand exercise, and this brief is that exercise.
 
 **Refreshing the stale documents.** Fixing all 18 costs a model pass over the whole fixture and is the operator's call, not a test. No suite asserts on their contents.
 
@@ -153,9 +152,9 @@ Creating the ignore inside the scenario rather than committing it at the root is
 
 depends_on: [1, 2]
 
-`check.sh` line 39 is `rm -rf .warlock`, run before the pact so that nothing is reused, and it takes `filed.toml` and the two `[[scope]]` records with it. There is no entry point. `README.md` is six lines about the fixture's shape and says nothing about cost. All four suites resolve their binary the same way — `WARLOCK="${WARLOCK:-$(command -v warlock)}"` — and none prints which version it got, so a FAIL line does not record what it was a FAIL against. `scopes.sh` and `incremental.sh` each check for a pacted fixture and exit 2 with instructions; `check.sh` is what makes that check pass.
+`check.sh` line 39 is `rm -rf .warlock`, run before the pact so that nothing is reused, and it takes the two `[[scope]]` records with it. There is no entry point. `README.md` is six lines about the fixture's shape and says nothing about cost. All four suites resolve their binary the same way — `WARLOCK="${WARLOCK:-$(command -v warlock)}"` — and none prints which version it got, so a FAIL line does not record what it was a FAIL against. `scopes.sh` and `incremental.sh` each check for a pacted fixture and exit 2 with instructions; `check.sh` is what makes that check pass.
 
-In `check.sh`, copy `.warlock/filed.toml` aside before the `rm -rf` and put it back after the pact, then reapply the two `[[scope]]` records and the scope lines on `.` and `infra` — `warlock scope add` with the team, review state and label each record carries, which is the shape `scopes.sh`'s `record()` helper at lines 71-73 documents. Both records are `team = "GEN"`, `review_state = "In Review"`, with label equal to the scope name. If one cannot be put back, `check.sh` names on stdout which record it dropped and exits non-zero, because a fixture that silently lost its board is the failure this slice exists to stop. The pact itself is left alone: it reuses nothing by design, and teaching it to spare files would change what `check.sh` proves.
+In `check.sh`, reapply the two `[[scope]]` records after the pact and the scope lines on `.` and `infra` — `warlock scope add` with the team, review state and label each record carries, which is the shape `scopes.sh`'s `record()` helper at lines 71-73 documents. Both records are `team = "GEN"`, `review_state = "In Review"`, with label equal to the scope name. If one cannot be put back, `check.sh` names on stdout which record it dropped and exits non-zero, because a fixture that silently lost its board is the failure this slice exists to stop. The pact itself is left alone: it reuses nothing by design, and teaching it to spare files would change what `check.sh` proves.
 
 Add one banner line to each of the four suites, after the binary check and before the first assertion, printing `"$WARLOCK" --version` and nothing else — no path, so the line stays the same wherever the binary lives. Add `run.sh`, resolving `WARLOCK` the way the suites do. Bare, it checks once that `.warlock/pacts.toml` exists, exits 2 with `run ./check.sh first` if not, then runs `surfaces.sh` and `scopes.sh`, each under its own `== name ==` header. With `--paid` it makes no such check — `check.sh` runs first and is what creates the manifest — and runs all four, `check.sh` first so the later suites have their prerequisite. It exits non-zero if any suite it ran did. The free run ends by naming each skipped suite, what it spends, and `./run.sh --paid`. Add a README section with a row per suite — what it asserts, what it spends, its prerequisites — two rows that spend nothing, `surfaces.sh` and `scopes.sh`, and two that spend model passes, `check.sh` and `incremental.sh`. `surfaces.sh` and `scopes.sh` spend nothing to run but need a pacted fixture, which only a paid `check.sh` provides, and the rows must say both. The section also states that no suite writes to Linear and that `brief` → `push` → `draft` → `pull` is exercised by hand against the GEN board.
 
