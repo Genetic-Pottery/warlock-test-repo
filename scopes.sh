@@ -28,6 +28,7 @@ ok()  { printf '  \033[32mPASS\033[0m %s\n' "$1"; pass=$((pass+1)); }
 bad() { printf '  \033[31mFAIL\033[0m %s\n' "$1"; fail=$((fail+1)); }
 
 [ -x "$WARLOCK" ] || { echo "no warlock binary at $WARLOCK (set WARLOCK=)"; exit 2; }
+"$WARLOCK" --version
 command -v jq >/dev/null || { echo "jq is needed to read --json"; exit 2; }
 [ -f "$MANIFEST" ] || { echo "no $MANIFEST — pact the fixture first"; exit 2; }
 for d in legacy services services/api services/api/handlers; do
