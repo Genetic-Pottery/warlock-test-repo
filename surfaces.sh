@@ -15,7 +15,10 @@
 # holds only `.warlock/`, so `.warlock/pacts.toml` is untracked: `git checkout`
 # will not restore it and `git clean -fd` will not remove it. A copy is taken
 # before anything is touched and put back from an `EXIT` trap, so a failed
-# assertion and an interrupt both leave the manifest the way they found it.
+# assertion and an interrupt both leave the manifest the way they found it. The
+# same trap carries the brief configuration `.warlock/briefs.toml` and the brief
+# template beside it, which git will not restore either: whichever of them the
+# run writes is removed again, because neither is in this fixture.
 #
 # Assertions are exit statuses and `--json` fields, never sentences. The prose
 # warlock prints is free to be reworded and is not what any of this is testing.
@@ -23,6 +26,12 @@
 # Nothing here runs a model pass. `pact` and `refresh` never appear in a
 # direction that walks a directory, so the whole script costs seconds and no
 # tokens.
+#
+# The one section that is not about the ledger is the brief front door: every
+# `push` below carries `--dry-run`, so no socket is opened and nothing reaches a
+# board. `push` wants a key bound to the checkout before it will say even that
+# much, so a throwaway one is stored under the redirected `HOME` and goes with
+# the sandbox on exit.
 #
 #   ./surfaces.sh
 set -uo pipefail
@@ -40,9 +49,29 @@ command -v jq >/dev/null || { echo "jq is needed to read --json"; exit 2; }
 
 sandbox=$(mktemp -d)
 cp "$MANIFEST" "$sandbox/pacts.toml.orig"
+
+# The two files `brief` reads before it sends anything. Neither is in the
+# fixture today and both sit under the gitignored `.warlock/`, so git neither
+# restores nor removes them: each one's pre-run state is taken here, ahead of the
+# trap, and `restore` puts back contents where there was a file and absence where
+# there was none. Taking it before `trap cleanup EXIT` is what covers an
+# interrupt partway through the section that writes them.
+BRIEFS=.warlock/briefs.toml
+TEMPLATE=.warlock/brief-template.md
+for f in "$BRIEFS" "$TEMPLATE"; do
+  [ -e "$f" ] && cp "$f" "$sandbox/$(basename "$f").orig"
+done
+restore() {
+  local f saved
+  for f in "$BRIEFS" "$TEMPLATE"; do
+    saved="$sandbox/$(basename "$f").orig"
+    if [ -e "$saved" ]; then cp "$saved" "$f"; else rm -f "$f"; fi
+  done
+}
+
 # The manifest is restored from the copy rather than from git, so a fixture with
 # uncommitted pacts comes out of this the way it went in.
-cleanup() { cp "$sandbox/pacts.toml.orig" "$MANIFEST"; rm -rf "$sandbox"; }
+cleanup() { cp "$sandbox/pacts.toml.orig" "$MANIFEST"; restore; rm -rf "$sandbox"; }
 trap cleanup EXIT
 export HOME="$sandbox/home"
 mkdir -p "$HOME"
@@ -61,6 +90,11 @@ unchanged()  {
   cmp -s "$MANIFEST" "$sandbox/pacts.toml.mark" && ok "$1" || bad "$1"
   checkpoint
 }
+
+# holds NAME — this machine holds exactly NAME for this repository, and nothing
+# else. `warlock config` replaces the whole set rather than adding to it, so the
+# sigil the rest of this suite writes across has to be held again afterwards.
+holds() { printf '%s\n' "$1" | "$WARLOCK" config >/dev/null 2>&1; }
 
 # field PATH KEY EXPECTED MESSAGE
 field() {
@@ -186,6 +220,72 @@ cp "$sandbox/pacts.toml.orig" "$MANIFEST"
 # among warlock's flags, and asking for one it does not define is a usage error
 # rather than a refusal or a failure to answer.
 status 2 "a flag warlock does not define is a usage error" -- "$WARLOCK" stale --verbose
+
+echo
+echo "== the brief front door, with nothing sent =="
+# `brief` → `push` → `draft` → `pull` is most of what warlock does, and the
+# three cases here are the ones that cost nothing: a dry-run push of the brief
+# this fixture already carries, a push at a scope with no board behind it, and a
+# refusal to send at all because the local brief configuration will not parse.
+#
+# Every `push` carries `--dry-run`, which prints what would be sent and opens no
+# socket. Nothing below reaches Linear and nothing below runs a model pass.
+brief=docs/warlock-brief-01-fix-entry-new-s-tripled-amount-add-entry-reverse-and-give.md
+[ -f "$brief" ] || { echo "no brief at $brief"; exit 2; }
+
+# The title is read out of the brief rather than written down here, so rewording
+# the document's first line does not turn into a FAIL on the line below.
+title=$(sed -n '1s/^# *//p' "$brief")
+[ -n "$title" ] || { echo "$brief carries no \`# \` title line to match on"; exit 2; }
+
+# `push` refuses before anything else when no key is bound to the checkout, so a
+# throwaway is stored and bound under the redirected `HOME`. It is not a Linear
+# key and is never offered to one: `--dry-run` opens no socket, and the sandbox
+# carries the whole store away on exit.
+printf 'not-a-linear-key\n' | "$WARLOCK" key add surfaces >/dev/null 2>&1
+"$WARLOCK" key use surfaces >/dev/null 2>&1
+
+# `status` throws stdout away, so this one is captured by hand: the suite runs
+# without `-e`, which is what makes `got=$?` on the next line worth reading.
+out=$("$WARLOCK" push --dry-run warlock-test "$brief" 2>&1); got=$?
+[ "$got" -eq 0 ] && ok "a dry-run push of the brief answers" ||
+  bad "a dry-run push of the brief answers (exit $got, wanted 0)"
+printf '%s\n' "$out" | grep -qF -- "$title" &&
+  ok "…and names the title it read off the brief" ||
+  bad "…and names the title it read off the brief (nothing in the output held \"$title\")"
+
+# A scope held but not recorded: warlock answers 1 for it before opening a
+# socket, because a name with no `[[scope]]` record is not a board here. The
+# record is absent rather than removed — nothing in this suite writes one — so
+# the listing below is the guard that the case is still the case it was written
+# for, and not a scope somebody has since added.
+scope_names=$(sed -n 's/^name = "\(.*\)"$/\1/p' "$MANIFEST" | LC_ALL=C sort)
+lacks "$scope_names" no-such-board "the manifest records no scope named \`no-such-board\`"
+holds "no-such-board"
+status 1 "a push at a scope with no board behind it could not answer" -- \
+  "$WARLOCK" push --dry-run no-such-board "$brief"
+
+# Held sets replace rather than accumulate, so `warlock-test` comes back before
+# the un-pact below, which is written across it.
+holds "warlock-test" || { echo "could not hold the warlock-test sigil again"; exit 2; }
+
+# A local brief configuration that will not parse. `brief` reads `.warlock/`
+# before it sends a word, so this refusal opens no socket and runs no model pass
+# — and having refused, it must not have left a brief behind in `docs/`, which is
+# what the listing either side of it says. The file is absent from this fixture
+# and `.gitignore` holds only `.warlock/`, so `restore` is the one thing that
+# takes it away again; it runs on the next line and from the `EXIT` trap too, so
+# a FAIL here still leaves `.warlock/` carrying `pacts.toml` alone.
+docs_before=$(ls -A docs | LC_ALL=C sort)
+printf 'this is not a brief config [[[\n' > "$BRIEFS"
+status 1 "a brief config that will not parse refuses to send" -- \
+  sh -c "'$WARLOCK' brief </dev/null"
+restore
+docs_after=$(ls -A docs | LC_ALL=C sort)
+same "and the refusal wrote no brief into docs/" "$docs_before" "$docs_after"
+
+cp "$sandbox/pacts.toml.orig" "$MANIFEST"
+unchanged "and no push, sigil or refusal above wrote a line into the manifest"
 
 echo
 echo "== un-pacting takes a directory out of both listings =="
