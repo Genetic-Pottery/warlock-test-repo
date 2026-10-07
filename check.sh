@@ -34,8 +34,14 @@ present() {
   if grep -qi -- "$1" "$2"; then ok "$3"; else bad "$3"; fi
 }
 
+# The binary check sits above the pact branch so that --no-pact reaches it too,
+# and the version banner follows it directly: that is the one spot both paths
+# pass through before the first assertion. A FAIL line is otherwise a FAIL
+# against nothing in particular.
+[ -x "$WARLOCK" ] || { echo "no warlock binary at $WARLOCK (set WARLOCK=)"; exit 2; }
+"$WARLOCK" --version
+
 if [ "${1:-}" != "--no-pact" ]; then
-  [ -x "$WARLOCK" ] || { echo "no warlock binary at $WARLOCK (set WARLOCK=)"; exit 2; }
   rm -rf .warlock
   find . -name .warlock.md -not -path ./.git/\* -delete
   git checkout -- pipeline/.warlock.md 2>/dev/null || true
