@@ -68,7 +68,7 @@ else
 
   echo
   echo "skipped, because a model pass costs money:"
-  echo "  check.sh        one pass per directory, over the 16 directories it pacts"
+  echo "  check.sh        one pass per directory, over the 18 directories it pacts"
   echo "  incremental.sh  a settling refresh, then one pass per scenario, over 4 scenarios"
   echo
   echo "  ./run.sh --paid  runs all four, check.sh first"

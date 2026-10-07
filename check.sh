@@ -99,6 +99,7 @@ present "REPORT_VERSION"    tools/scripts/.warlock.md  "python: a module const i
 present "Shelf"             tools/scripts/.warlock.md  "ruby: a class is declared"
 present "Invoice"           services/billing/.warlock.md "java: a class is declared"
 present "Stage"             pipeline/.warlock.md       "elixir: a defmodule is declared"
+present "LedgerApplyer"     monolith/.warlock.md       "go: a type in the large flat directory is declared"
 
 echo
 # Nothing here asserts that inventory.json is described. Two checks did, and
@@ -122,7 +123,7 @@ echo
 echo "== every directory is documented =="
 for d in . engine engine/core services services/api services/api/handlers \
          services/billing web web/src web/src/components tools tools/scripts \
-         pipeline infra legacy data; do
+         pipeline infra legacy data monolith; do
   [ -f "$d/.warlock.md" ] && ok "$d has a document" || bad "$d has no document"
 done
 
