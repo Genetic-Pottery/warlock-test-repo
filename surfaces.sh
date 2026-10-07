@@ -15,7 +15,10 @@
 # holds only `.warlock/`, so `.warlock/pacts.toml` is untracked: `git checkout`
 # will not restore it and `git clean -fd` will not remove it. A copy is taken
 # before anything is touched and put back from an `EXIT` trap, so a failed
-# assertion and an interrupt both leave the manifest the way they found it.
+# assertion and an interrupt both leave the manifest the way they found it. The
+# same trap carries the brief configuration `.warlock/briefs.toml` and the brief
+# template beside it, which git will not restore either: whichever of them the
+# run writes is removed again, because neither is in this fixture.
 #
 # Assertions are exit statuses and `--json` fields, never sentences. The prose
 # warlock prints is free to be reworded and is not what any of this is testing.
@@ -46,9 +49,29 @@ command -v jq >/dev/null || { echo "jq is needed to read --json"; exit 2; }
 
 sandbox=$(mktemp -d)
 cp "$MANIFEST" "$sandbox/pacts.toml.orig"
+
+# The two files `brief` reads before it sends anything. Neither is in the
+# fixture today and both sit under the gitignored `.warlock/`, so git neither
+# restores nor removes them: each one's pre-run state is taken here, ahead of the
+# trap, and `restore` puts back contents where there was a file and absence where
+# there was none. Taking it before `trap cleanup EXIT` is what covers an
+# interrupt partway through the section that writes them.
+BRIEFS=.warlock/briefs.toml
+TEMPLATE=.warlock/brief-template.md
+for f in "$BRIEFS" "$TEMPLATE"; do
+  [ -e "$f" ] && cp "$f" "$sandbox/$(basename "$f").orig"
+done
+restore() {
+  local f saved
+  for f in "$BRIEFS" "$TEMPLATE"; do
+    saved="$sandbox/$(basename "$f").orig"
+    if [ -e "$saved" ]; then cp "$saved" "$f"; else rm -f "$f"; fi
+  done
+}
+
 # The manifest is restored from the copy rather than from git, so a fixture with
 # uncommitted pacts comes out of this the way it went in.
-cleanup() { cp "$sandbox/pacts.toml.orig" "$MANIFEST"; rm -rf "$sandbox"; }
+cleanup() { cp "$sandbox/pacts.toml.orig" "$MANIFEST"; restore; rm -rf "$sandbox"; }
 trap cleanup EXIT
 export HOME="$sandbox/home"
 mkdir -p "$HOME"
@@ -200,9 +223,10 @@ status 2 "a flag warlock does not define is a usage error" -- "$WARLOCK" stale -
 
 echo
 echo "== the brief front door, with nothing sent =="
-# `brief` → `push` → `draft` → `pull` is most of what warlock does, and the two
-# cases here are the ones that cost nothing: a dry-run push of the brief this
-# fixture already carries, and a push at a scope with no board behind it.
+# `brief` → `push` → `draft` → `pull` is most of what warlock does, and the
+# three cases here are the ones that cost nothing: a dry-run push of the brief
+# this fixture already carries, a push at a scope with no board behind it, and a
+# refusal to send at all because the local brief configuration will not parse.
 #
 # Every `push` carries `--dry-run`, which prints what would be sent and opens no
 # socket. Nothing below reaches Linear and nothing below runs a model pass.
@@ -245,8 +269,23 @@ status 1 "a push at a scope with no board behind it could not answer" -- \
 # the un-pact below, which is written across it.
 holds "warlock-test" || { echo "could not hold the warlock-test sigil again"; exit 2; }
 
+# A local brief configuration that will not parse. `brief` reads `.warlock/`
+# before it sends a word, so this refusal opens no socket and runs no model pass
+# — and having refused, it must not have left a brief behind in `docs/`, which is
+# what the listing either side of it says. The file is absent from this fixture
+# and `.gitignore` holds only `.warlock/`, so `restore` is the one thing that
+# takes it away again; it runs on the next line and from the `EXIT` trap too, so
+# a FAIL here still leaves `.warlock/` carrying `pacts.toml` alone.
+docs_before=$(ls -A docs | LC_ALL=C sort)
+printf 'this is not a brief config [[[\n' > "$BRIEFS"
+status 1 "a brief config that will not parse refuses to send" -- \
+  sh -c "'$WARLOCK' brief </dev/null"
+restore
+docs_after=$(ls -A docs | LC_ALL=C sort)
+same "and the refusal wrote no brief into docs/" "$docs_before" "$docs_after"
+
 cp "$sandbox/pacts.toml.orig" "$MANIFEST"
-unchanged "and neither push, nor either sigil, wrote a line into the manifest"
+unchanged "and no push, sigil or refusal above wrote a line into the manifest"
 
 echo
 echo "== un-pacting takes a directory out of both listings =="
