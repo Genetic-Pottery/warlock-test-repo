@@ -42,6 +42,43 @@ if [ "${1:-}" != "--no-pact" ]; then
   echo "pacting…"
   "$WARLOCK" pact . || echo "(pact reported failures — the checks below say what survived)"
   echo
+
+  # `rm -rf .warlock` above took the whole manifest with it, including the two
+  # [[scope]] records and the `scope` keys that reference them on the `.` and
+  # `infra` pacts. A fresh pact reuses nothing and writes neither back, so they
+  # are put back here: without the root scope ./scopes.sh cannot start, and a
+  # later push or pull against warlock-test has no board to resolve to. The
+  # manifest is in .gitignore, so git will not restore it either.
+  #
+  # `infra` goes first. Once `.` carries warlock-test, `infra` sits under a
+  # closed scope and a `scope add` there is refused with 3 unless this machine
+  # holds the sigil.
+  #
+  # The flags are taken only while the named record does not exist yet, which is
+  # the case for both after the manifest was deleted. `--review-state` is the
+  # two words the records carry and is quoted accordingly — scopes.sh's
+  # `record()` helper passes a one-word `Review` so that its unquoted expansion
+  # word-splits, and that is not the shape to copy here.
+  #
+  # No `-e` is in force, so each status is tested.
+  restored=1
+  restore_scope() { # restore_scope PATH NAME
+    if "$WARLOCK" scope add "$1" "$2" \
+         --team-key GEN --review-state "In Review" --label "$2" >/dev/null 2>&1
+    then
+      echo "restored the $2 scope on $1"
+    else
+      echo "dropped the $2 scope on $1 — it could not be put back"
+      restored=0
+    fi
+  }
+  restore_scope infra infra-ops
+  restore_scope . warlock-test
+  if [ "$restored" -eq 0 ]; then
+    echo "the fixture's scopes are not what they were — fix that before checking"
+    exit 2
+  fi
+  echo
 fi
 
 echo "== symbols the language table must surface =="
