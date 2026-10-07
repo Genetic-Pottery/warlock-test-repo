@@ -152,6 +152,42 @@ same "stale's parsed paths are the lines it printed plain" "$stale_plain" "$stal
 same "…and fresh's are the lines it printed plain" "$fresh_plain" "$fresh_paths"
 
 echo
+echo "== the status table a script reads =="
+# 0 answered, 1 could not answer, 2 usage error, 3 refused having spent nothing,
+# 4 partly done. A script branches on the number, so each one is worth more than
+# the sentence printed beside it: a release that turned a 1 into a panic or into
+# a 0 would still print something plausible, and only the status says otherwise.
+# 3 is covered in scopes.sh, where a refusal can be provoked for nothing; 4 needs
+# a run that walked some directories and failed others, which costs a model pass
+# and so is left out of this suite deliberately.
+#
+# Every assertion below is the status alone — `status` already sends stdout and
+# stderr to /dev/null — because the prose around a status is free to be reworded
+# between releases and is not what these three are testing.
+
+# 1, could not answer: there is no repository to answer about. The directory is
+# fresh and sits under the sandbox, so nothing above it holds a `.git` and the
+# `EXIT` trap carries it away with the rest. The `cd` is inside a subshell, which
+# leaves this suite's own working directory where it was.
+outside=$(mktemp -d "$sandbox/outside.XXXXXX")
+status 1 "a listing outside any repository could not answer" -- \
+  sh -c "cd '$outside' && '$WARLOCK' stale"
+
+# 1 again, and emphatically not 101: the manifest is where it belongs but will
+# not parse. A Rust panic exits 101, so asserting the exact status is what rules
+# one out here. The copy goes back on the next line, before anything else reads
+# the ledger — and the `EXIT` trap would put it back regardless, so a FAIL on
+# this line still leaves the fixture the way it was found.
+printf 'this is not a pact manifest [[[\n' > "$MANIFEST"
+status 1 "a malformed manifest could not answer, and did not panic" -- "$WARLOCK" stale
+cp "$sandbox/pacts.toml.orig" "$MANIFEST"
+
+# 2, usage error: the command was never going to run at all. `--verbose` is not
+# among warlock's flags, and asking for one it does not define is a usage error
+# rather than a refusal or a failure to answer.
+status 2 "a flag warlock does not define is a usage error" -- "$WARLOCK" stale --verbose
+
+echo
 echo "== un-pacting takes a directory out of both listings =="
 # `data` and not `infra`: infra carries a `scope` of its own that this machine
 # does not hold, and an un-pact across an unheld scope refuses with 1 having done
