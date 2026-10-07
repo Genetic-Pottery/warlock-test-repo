@@ -24,6 +24,12 @@
 # direction that walks a directory, so the whole script costs seconds and no
 # tokens.
 #
+# The one section that is not about the ledger is the brief front door: every
+# `push` below carries `--dry-run`, so no socket is opened and nothing reaches a
+# board. `push` wants a key bound to the checkout before it will say even that
+# much, so a throwaway one is stored under the redirected `HOME` and goes with
+# the sandbox on exit.
+#
 #   ./surfaces.sh
 set -uo pipefail
 
@@ -61,6 +67,11 @@ unchanged()  {
   cmp -s "$MANIFEST" "$sandbox/pacts.toml.mark" && ok "$1" || bad "$1"
   checkpoint
 }
+
+# holds NAME — this machine holds exactly NAME for this repository, and nothing
+# else. `warlock config` replaces the whole set rather than adding to it, so the
+# sigil the rest of this suite writes across has to be held again afterwards.
+holds() { printf '%s\n' "$1" | "$WARLOCK" config >/dev/null 2>&1; }
 
 # field PATH KEY EXPECTED MESSAGE
 field() {
@@ -186,6 +197,56 @@ cp "$sandbox/pacts.toml.orig" "$MANIFEST"
 # among warlock's flags, and asking for one it does not define is a usage error
 # rather than a refusal or a failure to answer.
 status 2 "a flag warlock does not define is a usage error" -- "$WARLOCK" stale --verbose
+
+echo
+echo "== the brief front door, with nothing sent =="
+# `brief` → `push` → `draft` → `pull` is most of what warlock does, and the two
+# cases here are the ones that cost nothing: a dry-run push of the brief this
+# fixture already carries, and a push at a scope with no board behind it.
+#
+# Every `push` carries `--dry-run`, which prints what would be sent and opens no
+# socket. Nothing below reaches Linear and nothing below runs a model pass.
+brief=docs/warlock-brief-01-fix-entry-new-s-tripled-amount-add-entry-reverse-and-give.md
+[ -f "$brief" ] || { echo "no brief at $brief"; exit 2; }
+
+# The title is read out of the brief rather than written down here, so rewording
+# the document's first line does not turn into a FAIL on the line below.
+title=$(sed -n '1s/^# *//p' "$brief")
+[ -n "$title" ] || { echo "$brief carries no \`# \` title line to match on"; exit 2; }
+
+# `push` refuses before anything else when no key is bound to the checkout, so a
+# throwaway is stored and bound under the redirected `HOME`. It is not a Linear
+# key and is never offered to one: `--dry-run` opens no socket, and the sandbox
+# carries the whole store away on exit.
+printf 'not-a-linear-key\n' | "$WARLOCK" key add surfaces >/dev/null 2>&1
+"$WARLOCK" key use surfaces >/dev/null 2>&1
+
+# `status` throws stdout away, so this one is captured by hand: the suite runs
+# without `-e`, which is what makes `got=$?` on the next line worth reading.
+out=$("$WARLOCK" push --dry-run warlock-test "$brief" 2>&1); got=$?
+[ "$got" -eq 0 ] && ok "a dry-run push of the brief answers" ||
+  bad "a dry-run push of the brief answers (exit $got, wanted 0)"
+printf '%s\n' "$out" | grep -qF -- "$title" &&
+  ok "…and names the title it read off the brief" ||
+  bad "…and names the title it read off the brief (nothing in the output held \"$title\")"
+
+# A scope held but not recorded: warlock answers 1 for it before opening a
+# socket, because a name with no `[[scope]]` record is not a board here. The
+# record is absent rather than removed — nothing in this suite writes one — so
+# the listing below is the guard that the case is still the case it was written
+# for, and not a scope somebody has since added.
+scope_names=$(sed -n 's/^name = "\(.*\)"$/\1/p' "$MANIFEST" | LC_ALL=C sort)
+lacks "$scope_names" no-such-board "the manifest records no scope named \`no-such-board\`"
+holds "no-such-board"
+status 1 "a push at a scope with no board behind it could not answer" -- \
+  "$WARLOCK" push --dry-run no-such-board "$brief"
+
+# Held sets replace rather than accumulate, so `warlock-test` comes back before
+# the un-pact below, which is written across it.
+holds "warlock-test" || { echo "could not hold the warlock-test sigil again"; exit 2; }
+
+cp "$sandbox/pacts.toml.orig" "$MANIFEST"
+unchanged "and neither push, nor either sigil, wrote a line into the manifest"
 
 echo
 echo "== un-pacting takes a directory out of both listings =="
