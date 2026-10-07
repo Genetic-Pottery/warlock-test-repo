@@ -146,6 +146,37 @@ fi
 revert
 
 echo
+echo "== a .warlockignore keeps a file out, and editing it stales nothing =="
+cat > "$SUBJECT/vault.rs" <<'RS'
+pub const VAULT_SHARDS: u8 = 4;
+RS
+# Written by the scenario rather than committed. A committed ignore file is in
+# force for `check.sh`'s pact, where this directory is the source of the
+# LEDGER_VERSION, Posting and HASH_SEED assertions, and it would move the
+# settled baselines the three scenarios above compare against. It is untracked
+# at the root, and `.gitignore` here holds only `.warlock/`, so `git clean -qfd`
+# takes it away with the file it names.
+#
+# The entry is a path with a slash in it, which is how gitignore syntax anchors
+# a pattern to the directory the ignore file sits in — the root, here.
+printf '%s\n' "$SUBJECT/vault.rs" > .warlockignore
+if refresh "an ignored file"; then
+  # The precondition: a new file under a pacted directory stales it, so a
+  # directory that is still fresh with one sitting there is the ignore being
+  # honoured. Without the entry above, this is the assertion that fails.
+  [ -z "$("$WARLOCK" stale "$SUBJECT")" ] \
+    && ok "a new file the ignore names leaves the directory fresh" \
+    || bad "a new file the ignore names leaves the directory fresh"
+  # And then the thing itself, with nothing run in between: the edit that would
+  # have staled the directory is not even looked at.
+  printf '\npub const VAULT_RETRIES: u8 = 7;\n' >> "$SUBJECT/vault.rs"
+  [ -z "$("$WARLOCK" stale "$SUBJECT")" ] \
+    && ok "and changing it afterwards does not stale it either" \
+    || bad "and changing it afterwards does not stale it either"
+fi
+revert
+
+echo
 printf 'checks: \033[32m%d passed\033[0m, ' "$pass"
 if [ "$fail" -gt 0 ]; then printf '\033[31m%d failed\033[0m\n' "$fail"; exit 1; fi
 printf '0 failed\n'
