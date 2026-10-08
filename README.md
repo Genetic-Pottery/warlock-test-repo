@@ -25,3 +25,7 @@ nothing arrives at a board.
 
 The round trip of `brief` → `push` → `draft` → `pull` is exercised by hand
 against the GEN board. `docs/` holds the briefs those runs left behind.
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
