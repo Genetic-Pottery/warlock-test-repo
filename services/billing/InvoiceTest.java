@@ -65,4 +65,33 @@ public class InvoiceTest {
         assertTrue(invoice.isEmpty());
         assertEquals(0, invoice.lineCount());
     }
+
+    @Test
+    public void discountedByZeroKeepsTheTotal() {
+        Invoice invoice = new Invoice(1L);
+        assertEquals(45L, invoice.discounted(0));
+    }
+
+    @Test
+    public void discountedByOneHundredIsZero() {
+        Invoice invoice = new Invoice(1L);
+        assertEquals(0L, invoice.discounted(100));
+    }
+
+    @Test
+    public void discountedRoundsDown() {
+        Invoice invoice = new Invoice(1L);
+        // 45 * 90 / 100 = 40.5, which rounds down to 40.
+        assertEquals(40L, invoice.discounted(10));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void discountedRejectsANegativePercent() {
+        new Invoice(1L).discounted(-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void discountedRejectsAPercentAboveOneHundred() {
+        new Invoice(1L).discounted(101);
+    }
 }
