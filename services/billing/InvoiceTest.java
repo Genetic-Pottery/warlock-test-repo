@@ -1,6 +1,9 @@
 package billing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Currency;
 import org.junit.Test;
@@ -32,5 +35,34 @@ public class InvoiceTest {
     @Test(expected = NullPointerException.class)
     public void anInvoiceRejectsANullCurrency() {
         new Invoice(1L, null);
+    }
+
+    @Test
+    public void aNewInvoiceIsEmpty() {
+        Invoice invoice = new Invoice(1L);
+        assertTrue(invoice.isEmpty());
+        assertEquals(0, invoice.lineCount());
+    }
+
+    @Test
+    public void addLineCountsEachLine() {
+        Invoice invoice = new Invoice(1L);
+        invoice.addLine(500L);
+        invoice.addLine(0L);
+        assertFalse(invoice.isEmpty());
+        assertEquals(2, invoice.lineCount());
+    }
+
+    @Test
+    public void addLineRejectsANegativeAmount() {
+        Invoice invoice = new Invoice(1L);
+        try {
+            invoice.addLine(-1L);
+            fail("expected IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+            // expected
+        }
+        assertTrue(invoice.isEmpty());
+        assertEquals(0, invoice.lineCount());
     }
 }
