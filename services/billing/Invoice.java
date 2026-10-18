@@ -28,4 +28,8 @@ public class Invoice {
         }
         return total;
     }
+
+    public String formattedTotal() {
+        return total() + " " + currency.getCurrencyCode();
+    }
 }

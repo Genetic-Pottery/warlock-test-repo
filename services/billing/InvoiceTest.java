@@ -29,6 +29,18 @@ public class InvoiceTest {
         assertEquals(Currency.getInstance("EUR"), invoice.currency());
     }
 
+    @Test
+    public void anInvoiceFormatsItsTotalInUsd() {
+        Invoice invoice = new Invoice(1L);
+        assertEquals("45 USD", invoice.formattedTotal());
+    }
+
+    @Test
+    public void anInvoiceFormatsItsTotalInItsOwnCurrency() {
+        Invoice invoice = new Invoice(1L, Currency.getInstance("EUR"));
+        assertEquals("45 EUR", invoice.formattedTotal());
+    }
+
     @Test(expected = NullPointerException.class)
     public void anInvoiceRejectsANullCurrency() {
         new Invoice(1L, null);
