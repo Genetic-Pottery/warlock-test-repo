@@ -9,10 +9,12 @@ type route struct {
 	path   string
 }
 
-// A registry of HTTP routes.
+// A registry of HTTP routes. Routes in unprefixed match the whole
+// path and are listed explicitly; every other route sits under prefix.
 type Router struct {
-	prefix string
-	routes []route
+	prefix     string
+	routes     []route
+	unprefixed []route
 }
 
 const DefaultPrefix = "/v1"
@@ -23,14 +25,23 @@ func NewRouter() *Router {
 		routes: []route{
 			{method: "POST", path: "/entries/reverse"},
 		},
+		unprefixed: []route{
+			{method: "GET", path: "/healthz"},
+		},
 	}
 }
 
 // Handle reports whether method and path match a registered route.
-// The router's prefix is stripped from path before matching, since
+// Unprefixed routes are checked first, against the whole path. Then
+// the router's prefix is stripped from path before matching, since
 // routes are stored prefix-free; a path without the prefix matches
 // nothing. Both comparisons are exact and case-sensitive.
 func (r *Router) Handle(method, path string) bool {
+	for _, candidate := range r.unprefixed {
+		if candidate.method == method && candidate.path == path {
+			return true
+		}
+	}
 	rest, ok := strings.CutPrefix(path, r.prefix)
 	if !ok {
 		return false

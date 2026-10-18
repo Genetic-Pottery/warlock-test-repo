@@ -29,3 +29,24 @@ func TestHandleRejectsUnregisteredPath(t *testing.T) {
 		t.Fatal("expected GET /v1/things to be unhandled: /things is not a route")
 	}
 }
+
+func TestHandleMatchesUnprefixedHealthz(t *testing.T) {
+	r := NewRouter()
+	if !r.Handle("GET", "/healthz") {
+		t.Fatal("expected GET /healthz to be handled")
+	}
+}
+
+func TestHandleRejectsPrefixedHealthz(t *testing.T) {
+	r := NewRouter()
+	if r.Handle("GET", "/v1/healthz") {
+		t.Fatal("expected GET /v1/healthz to be unhandled: /healthz is registered without the prefix")
+	}
+}
+
+func TestHandleRejectsWrongMethodOnHealthz(t *testing.T) {
+	r := NewRouter()
+	if r.Handle("POST", "/healthz") {
+		t.Fatal("expected POST /healthz to be unhandled: the path is registered, the method is not")
+	}
+}
