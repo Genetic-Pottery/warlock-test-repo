@@ -7,3 +7,10 @@ tracker = "linear"
 team = "GEN"
 label = "warlock-plugin-test"
 review_state = "In Review"
+
+[[scope]]
+name = "billing"
+paths = ["services/billing"]
+tracker = "jira"
+team = "KAN"
+label = "warlock-plugin-test"
