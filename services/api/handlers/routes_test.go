@@ -9,6 +9,13 @@ func TestHandleMatchesRegisteredMethodAndPath(t *testing.T) {
 	}
 }
 
+func TestHandleMatchesInvoiceRoute(t *testing.T) {
+	r := NewRouter()
+	if !r.Handle("GET", "/v1/invoices/{id}") {
+		t.Fatal("expected GET /v1/invoices/{id} to be handled")
+	}
+}
+
 func TestHandleRejectsWrongMethodOnRegisteredPath(t *testing.T) {
 	r := NewRouter()
 	if r.Handle("GET", "/v1/entries/reverse") {

@@ -22,6 +22,7 @@ func NewRouter() *Router {
 		prefix: DefaultPrefix,
 		routes: []route{
 			{method: "POST", path: "/entries/reverse"},
+			{method: "GET", path: "/invoices/{id}"},
 		},
 	}
 }
