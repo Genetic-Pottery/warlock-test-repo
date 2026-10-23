@@ -1,6 +1,7 @@
 package billing;
 
 public class Invoice {
+    public static final int MIN_LINES = 1;
     public static final int MAX_LINES = 200;
     private final long id;
 
