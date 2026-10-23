@@ -17,13 +17,7 @@ tracker = "linear"
 team = "GEN"
 
 [[scope]]
-name = "billing"
-paths = ["services/billing"]
-tracker = "jira"
-team = "KAN"
-
-[[scope]]
 name = "api"
 paths = ["services/api"]
-tracker = "jira"
-team = "KB"
+tracker = "linear"
+team = "WAR"
