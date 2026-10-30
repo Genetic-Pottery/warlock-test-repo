@@ -5,6 +5,10 @@ import (
 	"errors"
 	"time"
 )
+
+// MaxExportPageSize is the maximum rows per export page.
+const MaxExportPageSize = 500
+
 // ErrExportMissing is returned when no export row backs the id.
 var ErrExportMissing = errors.New("export: not found")
 
