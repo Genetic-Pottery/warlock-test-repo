@@ -28,6 +28,9 @@ func (r *RetryApplyer) Apply(ctx context.Context, id string) (*Retry, error) {
 	}
 	row.Stamp = r.clock().UTC()
 	for attempt := 0; attempt < r.retries; attempt++ {
+		if attempt > 0 {
+			time.Sleep(Backoff(attempt))
+		}
 		if err := r.store.Save(ctx, row); err == nil {
 			return row, nil
 		}
