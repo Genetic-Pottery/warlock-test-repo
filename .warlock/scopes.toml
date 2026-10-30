@@ -21,3 +21,9 @@ name = "api"
 paths = ["services/api"]
 tracker = "linear"
 team = "WAR"
+
+[[scope]]
+name = "billing"
+paths = ["services/billing"]
+tracker = "jira"
+team = "KAN"
