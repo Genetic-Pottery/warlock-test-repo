@@ -13,6 +13,11 @@ class Report:
             total += row
         return total
 
+    def mean(self):
+        if not self.rows:
+            return 0.0
+        return float(self.total() / len(self.rows))
+
 def build_report(rows):
     return Report(rows)
 
