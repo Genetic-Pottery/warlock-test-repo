@@ -13,3 +13,11 @@ def test_report_mean_of_rows():
 
 def test_report_mean_of_no_rows_is_zero():
     assert build_report([]).mean() == 0.0
+
+def test_report_summary_of_rows():
+    assert build_report([1, 2, 3]).summary() == {
+        "version": 3, "rows": 3, "total": 6, "mean": 2.0}
+
+def test_report_summary_of_no_rows():
+    assert build_report([]).summary() == {
+        "version": 3, "rows": 0, "total": 0, "mean": 0.0}
